@@ -374,12 +374,34 @@ Container.set({
 
 ## 文档
 
-详细的使用指南和 API 文档可以在以下位置找到：
+### 📖 在线文档
 
-- [在线文档][docs-stable]
-- 项目仓库的 `./docs` 目录
+- 📘 [GitHub Pages 文档](https://ximing.github.io/typedi/) (推荐)
+- 📂 [本地文档](./docs) - 查看 `./docs` 目录
 
-[docs-stable]: https://docs.typestack.community/typedi/
+### 🛠️ 本地运行文档
+
+```bash
+# 安装 GitBook CLI
+npm install -g gitbook-cli
+
+# 安装文档插件
+npm run docs:install
+
+# 启动文档服务器
+npm run docs:serve
+
+# 访问 http://localhost:4000
+```
+
+### 📝 文档开发
+
+查看 [文档设置指南](./DOCS_SETUP.md) 了解如何:
+
+- 编辑和新增文档
+- 本地预览文档
+- 自定义样式和插件
+- 部署到 GitHub Pages
 
 ## 贡献
 

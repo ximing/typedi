@@ -374,12 +374,34 @@ Container.set({
 
 ## Documentation
 
-Detailed usage guides and API documentation can be found at:
+### 📖 Online Documentation
 
-- [Online Documentation][docs-stable]
-- The `./docs` directory in the project repository
+- 📘 [GitHub Pages Documentation](https://ximing.github.io/typedi/) (Recommended)
+- 📂 [Local Documentation](./docs) - View the `./docs` directory
 
-[docs-stable]: https://docs.typestack.community/typedi/
+### 🛠️ Running Documentation Locally
+
+```bash
+# Install GitBook CLI
+npm install -g gitbook-cli
+
+# Install documentation plugins
+npm run docs:install
+
+# Start documentation server
+npm run docs:serve
+
+# Visit http://localhost:4000
+```
+
+### 📝 Documentation Development
+
+See [Documentation Setup Guide](./DOCS_SETUP.md) to learn how to:
+
+- Edit and add documentation
+- Preview documentation locally
+- Customize styles and plugins
+- Deploy to GitHub Pages
 
 ## Contributing
 
