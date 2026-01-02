@@ -15,7 +15,7 @@ export function InjectMany(token: Token<any>): Function;
 export function InjectMany(
   typeOrIdentifier?: ((type?: never) => Constructable<unknown>) | ServiceIdentifier<unknown>
 ): Function {
-  return function (target: Object, propertyName: string | Symbol, index?: number): void {
+  return function (target: object, propertyName: string | symbol, index?: number): void {
     const typeWrapper = resolveToTypeWrapper(typeOrIdentifier, target, propertyName, index);
 
     /** If no type was inferred, or the general Object type was inferred we throw an error. */

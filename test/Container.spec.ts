@@ -141,8 +141,8 @@ describe('Container', function () {
       Container.remove(['test1-service', 'test2-service']);
 
       expect(Container.get(TestService)).toBe(testService);
-      expect(() => Container.get<TestService>('test1-service')).toThrowError(ServiceNotFoundError);
-      expect(() => Container.get<TestService>('test2-service')).toThrowError(ServiceNotFoundError);
+      expect(() => Container.get<TestService>('test1-service')).toThrow(ServiceNotFoundError);
+      expect(() => Container.get<TestService>('test2-service')).toThrow(ServiceNotFoundError);
     });
   });
 
@@ -169,7 +169,10 @@ describe('Container', function () {
     it('should have ability to pre-specify class initialization parameters', function () {
       @Service()
       class ExtraService {
-        constructor(public luckyNumber: number, public message: string) {}
+        constructor(
+          public luckyNumber: number,
+          public message: string
+        ) {}
       }
 
       Container.registerHandler({
@@ -338,8 +341,8 @@ describe('Container', function () {
       const instanceATwo = Container.get(MyServiceA);
       const instanceBTwo = Container.get(MyServiceB);
 
-      expect(destroyFnMock).toBeCalledTimes(1);
-      expect(destroyPropertyFnMock).toBeCalledTimes(1);
+      expect(destroyFnMock).toHaveBeenCalledTimes(1);
+      expect(destroyPropertyFnMock).toHaveBeenCalledTimes(1);
 
       expect(instanceAOne).toBeInstanceOf(MyServiceA);
       expect(instanceATwo).toBeInstanceOf(MyServiceA);
@@ -385,14 +388,14 @@ describe('Container', function () {
       Container.get(MyServiceA);
       Container.get(MyServiceB);
 
-      expect(() => Container.remove(MyServiceA)).not.toThrowError();
-      expect(() => Container.remove(MyServiceB)).not.toThrowError();
+      expect(() => Container.remove(MyServiceA)).not.toThrow();
+      expect(() => Container.remove(MyServiceB)).not.toThrow();
 
-      expect(destroyFnMock).toBeCalledTimes(1);
-      expect(destroyPropertyFnMock).toBeCalledTimes(1);
+      expect(destroyFnMock).toHaveBeenCalledTimes(1);
+      expect(destroyPropertyFnMock).toHaveBeenCalledTimes(1);
 
-      expect(() => Container.get(MyServiceA)).toThrowError(ServiceNotFoundError);
-      expect(() => Container.get(MyServiceB)).toThrowError(ServiceNotFoundError);
+      expect(() => Container.get(MyServiceA)).toThrow(ServiceNotFoundError);
+      expect(() => Container.get(MyServiceB)).toThrow(ServiceNotFoundError);
     });
 
     it('should be able to destroy services without destroy function', () => {
@@ -401,8 +404,8 @@ describe('Container', function () {
 
       Container.get(MyService);
 
-      expect(() => Container.remove(MyService)).not.toThrowError();
-      expect(() => Container.get(MyService)).toThrowError(ServiceNotFoundError);
+      expect(() => Container.remove(MyService)).not.toThrow();
+      expect(() => Container.get(MyService)).toThrow(ServiceNotFoundError);
     });
   });
 });

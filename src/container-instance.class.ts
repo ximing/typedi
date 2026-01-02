@@ -268,7 +268,7 @@ export class ContainerInstance {
   /**
    * Helper method that imports given services.
    */
-  /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
+
   public import(services: Function[]): ContainerInstance {
     this.throwIfDisposed();
 
