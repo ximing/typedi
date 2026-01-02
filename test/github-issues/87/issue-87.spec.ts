@@ -17,7 +17,7 @@ describe('Github Issues', function () {
     class MyClass {
       constructor(
         private injectedClassA: InjectedClassA,
-        private injectedClassB: InjectedClassB
+        private injectedClassB: InjectedClassB,
       ) {}
     }
 

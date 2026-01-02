@@ -9,7 +9,7 @@ You can create your own decorators which will inject your given values for your 
 export function Logger() {
   return function (object: Object, propertyName: string, index?: number) {
     const logger = new ConsoleLogger();
-    Container.registerHandler({ object, propertyName, index, value: containerInstance => logger });
+    Container.registerHandler({ object, propertyName, index, value: (containerInstance) => logger });
   };
 }
 

@@ -10,6 +10,7 @@ import { ContainerIdentifier } from './types/container-identifier.type';
 import { Handler } from './interfaces/handler.interface';
 import { ContainerRegistry } from './container-registry.class';
 import { ContainerScope } from './types/container-scope.type';
+import { ContainerOptions } from './interfaces/container-options.interface';
 
 /**
  * TypeDI can have multiple containers.
@@ -43,8 +44,19 @@ export class ContainerInstance {
    */
   private disposed: boolean = false;
 
-  constructor(id: ContainerIdentifier) {
+  /** Parent container for inheritance. */
+  private parentContainer: ContainerInstance | null = null;
+
+  /** Container options. */
+  private options: ContainerOptions = { inherit: true };
+
+  /** Cached root container to avoid repeated traversal. */
+  private cachedRootContainer: ContainerInstance | null = null;
+
+  constructor(id: ContainerIdentifier, options?: Partial<ContainerOptions>, parentContainer?: ContainerInstance) {
     this.id = id;
+    this.options = { inherit: true, ...options };
+    this.parentContainer = parentContainer || null;
 
     ContainerRegistry.registerContainer(this);
 
@@ -56,13 +68,63 @@ export class ContainerInstance {
   }
 
   /**
+   * Gets the parent container.
+   */
+  public getParent(): ContainerInstance | null {
+    return this.parentContainer;
+  }
+
+  /**
+   * Gets the root container.
+   */
+  public getRoot(): ContainerInstance {
+    if (this.cachedRootContainer) {
+      return this.cachedRootContainer;
+    }
+
+    let current: ContainerInstance = this;
+    while (current.parentContainer) {
+      current = current.parentContainer;
+    }
+
+    this.cachedRootContainer = current;
+    return current;
+  }
+
+  /**
+   * Gets the container options.
+   */
+  public getOptions(): Readonly<ContainerOptions> {
+    return { ...this.options };
+  }
+
+  /**
    * Checks if the service with given name or type is registered service container.
    * Optionally, parameters can be passed in case if instance is initialized in the container for the first time.
    */
   public has<T = unknown>(identifier: ServiceIdentifier<T>): boolean {
     this.throwIfDisposed();
 
-    return !!this.metadataMap.has(identifier) || !!this.multiServiceIds.has(identifier);
+    // 1. Check local container
+    if (this.metadataMap.has(identifier) || this.multiServiceIds.has(identifier)) {
+      return true;
+    }
+
+    // 2. Check root container's singleton
+    const root = this.getRoot();
+    if (root !== this) {
+      const metadata = root.metadataMap.get(identifier);
+      if (metadata && metadata.scope === 'singleton') {
+        return true;
+      }
+    }
+
+    // 3. Check parent container if inheritance is enabled
+    if (this.options.inherit && this.parentContainer) {
+      return this.parentContainer.has(identifier);
+    }
+
+    return false;
   }
 
   /**
@@ -72,42 +134,79 @@ export class ContainerInstance {
   public get<T = unknown>(identifier: ServiceIdentifier<T>): T {
     this.throwIfDisposed();
 
-    const global = ContainerRegistry.defaultContainer.metadataMap.get(identifier);
-    const local = this.metadataMap.get(identifier);
-    /** If the service is registered as global we load it from there, otherwise we use the local one. */
-    const metadata = global?.scope === 'singleton' ? global : local;
-
-    /** This should never happen as multi services are masked with custom token in Container.set. */
-    if (metadata && metadata.multiple === true) {
-      throw new Error(`Cannot resolve multiple values for ${identifier.toString()} service!`);
-    }
-
-    /** Otherwise it's returned from the current container. */
-    if (metadata) {
+    // ===== Step 1: Check local container's definition =====
+    let metadata = this.metadataMap.get(identifier);
+    if (metadata && !metadata.multiple) {
       return this.getServiceValue(metadata);
     }
 
-    /**
-     * If it's the first time requested in the child container we load it from parent and set it.
-     * TODO: This will be removed with the container inheritance rework.
-     */
-    if (global && this !== ContainerRegistry.defaultContainer) {
-      const clonedService = { ...global };
-      clonedService.value = EMPTY_VALUE;
+    // ===== Step 2: Check local container's multi-services =====
+    if (this.multiServiceIds.has(identifier)) {
+      return this.getMany(identifier) as any;
+    }
 
-      /**
-       * We need to immediately set the empty value from the root container
-       * to prevent infinite lookup in cyclic dependencies.
-       */
-      this.set(clonedService);
+    // ===== Step 3: Check root container's singleton (global priority) =====
+    const root = this.getRoot();
+    if (root !== this) {
+      const rootMetadata = root.metadataMap.get(identifier);
+      if (rootMetadata && rootMetadata.scope === 'singleton') {
+        return this.getServiceValue(rootMetadata);
+      }
+    }
 
-      const value = this.getServiceValue(clonedService);
-      this.set({ ...clonedService, value });
-
-      return value;
+    // ===== Step 4: Resolve from parent if inheritance is enabled =====
+    if (this.options.inherit && this.parentContainer) {
+      return this.resolveFromParent<T>(identifier);
     }
 
     throw new ServiceNotFoundError(identifier);
+  }
+
+  /**
+   * Resolves a service from parent container.
+   *
+   * Key rules:
+   * - Singleton: cached in root container (already handled in step 3)
+   * - Container scope: cached in the calling container (this)
+   * - Transient: not cached, create directly
+   */
+  private resolveFromParent<T = unknown>(identifier: ServiceIdentifier<T>): T {
+    // Try to get definition directly from parent's metadataMap
+    const parentMetadata = this.parentContainer!.metadataMap.get(identifier);
+
+    if (parentMetadata) {
+      // If it's singleton, should already be handled in step 3
+      // Check again for defensive programming
+      if (parentMetadata.scope === 'singleton') {
+        const root = this.getRoot();
+        return this.getServiceValue(parentMetadata);
+      }
+
+      // If it's container scope, we need to cache instance in THIS container
+      // Create a copy of metadata without the value, so it will be instantiated and cached here
+      if (parentMetadata.scope === 'container') {
+        // Check if we already have a local copy (cached instance)
+        let localMetadata = this.metadataMap.get(identifier);
+        if (!localMetadata) {
+          // Create a new metadata entry in this container with the same definition but no value yet
+          localMetadata = {
+            ...parentMetadata,
+            value: EMPTY_VALUE,
+            referencedBy: new Map([[this.id, this]]),
+          };
+          this.metadataMap.set(identifier, localMetadata);
+        }
+        return this.getServiceValue(localMetadata);
+      }
+
+      // If it's transient, create directly using parent's metadata (no cache anywhere)
+      if (parentMetadata.scope === 'transient') {
+        return this.getServiceValue(parentMetadata);
+      }
+    }
+
+    // No definition in parent's metadataMap, continue recursing upward
+    return this.parentContainer!.get<T>(identifier);
   }
 
   /**
@@ -117,19 +216,24 @@ export class ContainerInstance {
   public getMany<T = unknown>(identifier: ServiceIdentifier<T>): T[] {
     this.throwIfDisposed();
 
-    const globalIdMap = ContainerRegistry.defaultContainer.multiServiceIds.get(identifier);
+    // 1. Check local container
     const localIdMap = this.multiServiceIds.get(identifier);
-
-    /**
-     * If the service is registered as singleton we load it from default
-     * container, otherwise we use the local one.
-     */
-    if (globalIdMap?.scope === 'singleton') {
-      return globalIdMap.tokens.map(generatedId => ContainerRegistry.defaultContainer.get<T>(generatedId));
+    if (localIdMap) {
+      return localIdMap.tokens.map((generatedId) => this.get<T>(generatedId));
     }
 
-    if (localIdMap) {
-      return localIdMap.tokens.map(generatedId => this.get<T>(generatedId));
+    // 2. Check root container's singleton
+    const root = this.getRoot();
+    if (root !== this) {
+      const rootIdMap = root.multiServiceIds.get(identifier);
+      if (rootIdMap && rootIdMap.scope === 'singleton') {
+        return rootIdMap.tokens.map((generatedId) => root.get<T>(generatedId));
+      }
+    }
+
+    // 3. Check parent container if inheritance is enabled
+    if (this.options.inherit && this.parentContainer) {
+      return this.parentContainer.getMany<T>(identifier);
     }
 
     throw new ServiceNotFoundError(identifier);
@@ -141,13 +245,11 @@ export class ContainerInstance {
   public set<T = unknown>(serviceOptions: ServiceOptions<T>): this {
     this.throwIfDisposed();
 
-    /**
-     * If the service is marked as singleton, we set it in the default container.
-     * (And avoid an infinite loop via checking if we are in the default container or not.)
-     */
-    if (serviceOptions.scope === 'singleton' && ContainerRegistry.defaultContainer !== this) {
-      ContainerRegistry.defaultContainer.set(serviceOptions);
+    // Singleton is always registered in root container
+    const targetContainer = serviceOptions.scope === 'singleton' ? this.getRoot() : this;
 
+    if (targetContainer !== this) {
+      targetContainer.set(serviceOptions);
       return this;
     }
 
@@ -161,7 +263,6 @@ export class ContainerInstance {
       factory: (serviceOptions as ServiceMetadata<T>).factory,
       value: (serviceOptions as ServiceMetadata<T>).value || EMPTY_VALUE,
       multiple: serviceOptions.multiple || false,
-      eager: serviceOptions.eager || false,
       scope: serviceOptions.scope || 'container',
       /** We allow overriding the above options via the received config object. */
       ...serviceOptions,
@@ -200,15 +301,6 @@ export class ContainerInstance {
       this.metadataMap.set(newMetadata.id, newMetadata);
     }
 
-    /**
-     * If the service is eager, we need to create an instance immediately except
-     * when the service is also marked as transient. In that case we ignore
-     * the eager flag to prevent creating a service what cannot be disposed later.
-     */
-    if (newMetadata.eager && newMetadata.scope !== 'transient') {
-      this.get(newMetadata.id);
-    }
-
     return this;
   }
 
@@ -219,7 +311,7 @@ export class ContainerInstance {
     this.throwIfDisposed();
 
     if (Array.isArray(identifierOrIdentifierArray)) {
-      identifierOrIdentifierArray.forEach(id => this.remove(id));
+      identifierOrIdentifierArray.forEach((id) => this.remove(id));
     } else {
       const serviceMetadata = this.metadataMap.get(identifierOrIdentifierArray);
 
@@ -233,28 +325,44 @@ export class ContainerInstance {
   }
 
   /**
-   * Gets a separate container instance for the given instance id.
+   * Gets or creates a separate container instance for the given instance id.
+   *
+   * @param containerId The ID for the container
+   * @param options Optional container options
+   * @param parentId Optional parent container ID. If not provided and this is the root container, uses this as parent.
    */
-  public of(containerId: ContainerIdentifier = 'default'): ContainerInstance {
+  public of(
+    containerId: ContainerIdentifier = 'default',
+    options?: Partial<ContainerOptions>,
+    parentId?: ContainerIdentifier,
+  ): ContainerInstance {
     this.throwIfDisposed();
 
     if (containerId === 'default') {
       return ContainerRegistry.defaultContainer;
     }
 
-    let container: ContainerInstance;
-
+    // If container already exists, return existing container
     if (ContainerRegistry.hasContainer(containerId)) {
-      container = ContainerRegistry.getContainer(containerId);
-    } else {
-      /**
-       * This is deprecated functionality, for now we create the container if it's doesn't exists.
-       * This will be reworked when container inheritance is reworked.
-       */
-      container = new ContainerInstance(containerId);
+      return ContainerRegistry.getContainer(containerId);
     }
 
-    return container;
+    // Determine parent container
+    let parentContainer: ContainerInstance | undefined;
+    if (parentId !== undefined) {
+      // If parentId is explicitly provided, use it
+      parentContainer = ContainerRegistry.hasContainer(parentId)
+        ? ContainerRegistry.getContainer(parentId)
+        : new ContainerInstance(parentId);
+    } else {
+      // If no parentId specified:
+      // - If this is the root container (has no parent), use this as parent for backward compatibility
+      // - If this is not root (has a parent), don't set parent to avoid unintended nesting
+      parentContainer = this.parentContainer === null ? this : undefined;
+    }
+
+    // Create new container
+    return new ContainerInstance(containerId, options, parentContainer);
   }
 
   /**
@@ -283,10 +391,20 @@ export class ContainerInstance {
 
     switch (options.strategy) {
       case 'resetValue':
-        this.metadataMap.forEach(service => this.disposeServiceInstance(service));
+        // Only dispose services exclusively owned by this container
+        this.metadataMap.forEach((service) => {
+          if (service.referencedBy.size === 1 && service.referencedBy.has(this.id)) {
+            this.disposeServiceInstance(service);
+          }
+        });
         break;
       case 'resetServices':
-        this.metadataMap.forEach(service => this.disposeServiceInstance(service));
+        // Only dispose services exclusively owned by this container
+        this.metadataMap.forEach((service) => {
+          if (service.referencedBy.size === 1 && service.referencedBy.has(this.id)) {
+            this.disposeServiceInstance(service);
+          }
+        });
         this.metadataMap.clear();
         this.multiServiceIds.clear();
         break;
@@ -297,7 +415,18 @@ export class ContainerInstance {
   }
 
   public async dispose(): Promise<void> {
-    this.reset({ strategy: 'resetServices' });
+    this.throwIfDisposed();
+
+    // Only dispose services exclusively owned by this container
+    this.metadataMap.forEach((service) => {
+      if (service.referencedBy.size === 1 && service.referencedBy.has(this.id)) {
+        this.disposeServiceInstance(service, true);
+      }
+    });
+
+    // Clear all metadata and multi-service IDs
+    this.metadataMap.clear();
+    this.multiServiceIds.clear();
 
     /** We mark the container as disposed, forbidding any further interaction with it. */
     this.disposed = true;
@@ -412,27 +541,25 @@ export class ContainerInstance {
    */
   private initializeParams(target: Function, paramTypes: any[]): unknown[] {
     return paramTypes.map((paramType, index) => {
-      const paramHandler =
-        this.handlers.find(handler => {
-          /**
-           * @Inject()-ed values are stored as parameter handlers and they reference their target
-           * when created. So when a class is extended the @Inject()-ed values are not inherited
-           * because the handler still points to the old object only.
-           *
-           * As a quick fix a single level parent lookup is added via `Object.getPrototypeOf(target)`,
-           * however this should be updated to a more robust solution.
-           *
-           * TODO: Add proper inheritance handling: either copy the handlers when a class is registered what
-           * TODO: has it's parent already registered as dependency or make the lookup search up to the base Object.
-           */
-          return handler.object === target && handler.index === index;
-        }) ||
-        this.handlers.find(handler => {
-          return handler.object === Object.getPrototypeOf(target) && handler.index === index;
-        });
+      // 1. Check local container
+      let paramHandler = this.handlers.find((handler) => handler.object === target && handler.index === index);
 
       if (paramHandler) return paramHandler.value(this);
 
+      // 2. Recursively check parent containers (supports multi-level inheritance)
+      if (!paramHandler && this.parentContainer) {
+        paramHandler = this.findHandlerInParent(target, index);
+        if (paramHandler) return paramHandler.value(this);
+      }
+
+      // 3. Single level parent check (handles class inheritance)
+      paramHandler = this.handlers.find(
+        (handler) => handler.object === Object.getPrototypeOf(target) && handler.index === index,
+      );
+
+      if (paramHandler) return paramHandler.value(this);
+
+      // 4. Auto-injection
       // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       if (paramType && paramType.name && !this.isPrimitiveParamType(paramType.name)) {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
@@ -451,10 +578,23 @@ export class ContainerInstance {
   }
 
   /**
+   * Recursively searches for a handler in parent containers.
+   */
+  private findHandlerInParent(target: Function, index: number): Handler | undefined {
+    if (!this.parentContainer) return undefined;
+
+    const handler = this.parentContainer.handlers.find((h) => h.object === target && h.index === index);
+
+    if (handler) return handler;
+
+    return this.parentContainer.findHandlerInParent(target, index);
+  }
+
+  /**
    * Applies all registered handlers on a given target class.
    */
   private applyPropertyHandlers(target: Function, instance: { [key: string]: any }) {
-    this.handlers.forEach(handler => {
+    this.handlers.forEach((handler) => {
       if (typeof handler.index === 'number') return;
       if (handler.object.constructor !== target && !(target.prototype instanceof handler.object.constructor)) return;
 
@@ -471,19 +611,28 @@ export class ContainerInstance {
    * @param serviceMetadata the service metadata containing the instance to destroy
    * @param force when true the service will be always destroyed even if it's cannot be re-created
    */
+  /**
+   * Disposes a service instance by calling its dispose method (if exists) and resetting its value.
+   *
+   * @param serviceMetadata The service metadata to dispose
+   * @param force Force reset value even if type or factory doesn't exist
+   */
   private disposeServiceInstance(serviceMetadata: ServiceMetadata, force = false) {
     this.throwIfDisposed();
 
-    /** We reset value only if we can re-create it (aka type or factory exists). */
+    /** We reset value only if we can re-create it (aka type or factory exists) or force is true. */
     const shouldResetValue = force || !!serviceMetadata.type || !!serviceMetadata.factory;
 
     if (shouldResetValue) {
-      /** If we wound a function named destroy we call it without any params. */
-      if (typeof (serviceMetadata?.value as Record<string, unknown>)['dispose'] === 'function') {
+      /** If the service has a dispose method, call it. */
+      if (
+        serviceMetadata.value !== EMPTY_VALUE &&
+        typeof (serviceMetadata?.value as Record<string, unknown>)['dispose'] === 'function'
+      ) {
         try {
           (serviceMetadata.value as { dispose: CallableFunction }).dispose();
         } catch (error) {
-          /** We simply ignore the errors from the destroy function. */
+          /** We simply ignore the errors from the dispose function. */
         }
       }
 

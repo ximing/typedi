@@ -140,7 +140,7 @@ class CarFactory {
 class Car {
   constructor(
     public model: string,
-    public logger: LoggerInterface
+    public logger: LoggerInterface,
   ) {}
 }
 ```
@@ -172,14 +172,14 @@ One of them will be undefined and it cause errors. To fix them you need to speci
 // Car.ts
 @Service()
 export class Car {
-  @Inject(type => Engine)
+  @Inject((type) => Engine)
   engine: Engine;
 }
 
 // Engine.ts
 @Service()
 export class Engine {
-  @Inject(type => Car)
+  @Inject((type) => Car)
   car: Car;
 }
 ```
@@ -196,7 +196,7 @@ For example:
 export function Logger() {
   return function (object: Object, propertyName: string, index?: number) {
     const logger = new ConsoleLogger();
-    Container.registerHandler({ object, propertyName, index, value: containerInstance => logger });
+    Container.registerHandler({ object, propertyName, index, value: (containerInstance) => logger });
   };
 }
 
@@ -267,7 +267,7 @@ export class WaterFactory implements Factory {
 // now you can get all factories in a single array
 Container.import([BeanFactory, SugarFactory, WaterFactory]);
 const factories = Container.getMany(FactoryToken); // factories is Factory[]
-factories.forEach(factory => factory.create());
+factories.forEach((factory) => factory.create());
 ```
 
 ### Using multiple containers and scoped containers
@@ -352,7 +352,7 @@ export const PostController = Service(
       name: repository.getName(),
       query: queryBuilder.build(),
     };
-  }
+  },
 );
 
 const postController = Container.get(PostController);

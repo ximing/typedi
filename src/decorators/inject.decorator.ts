@@ -13,7 +13,7 @@ export function Inject(typeFn: (type?: never) => Constructable<unknown>): Functi
 export function Inject(serviceName?: string): Function;
 export function Inject(token: Token<unknown>): Function;
 export function Inject(
-  typeOrIdentifier?: ((type?: never) => Constructable<unknown>) | ServiceIdentifier<unknown>
+  typeOrIdentifier?: ((type?: never) => Constructable<unknown>) | ServiceIdentifier<unknown>,
 ): ParameterDecorator | PropertyDecorator {
   return function (target: object, propertyName: string | symbol, index?: number): void {
     const typeWrapper = resolveToTypeWrapper(typeOrIdentifier, target, propertyName, index);
@@ -27,7 +27,7 @@ export function Inject(
       object: target as Constructable<unknown>,
       propertyName: propertyName as string,
       index: index,
-      value: containerInstance => {
+      value: (containerInstance) => {
         const evaluatedLazyType = typeWrapper.lazyType();
 
         /** If no type was inferred lazily, or the general Object type was inferred we throw an error. */

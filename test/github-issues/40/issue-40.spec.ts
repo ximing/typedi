@@ -12,7 +12,7 @@ describe('github issues > #40 Constructor inject not working', function () {
       constructor(
         @Inject('moment') public moment: any,
         @Inject('jsonwebtoken') public jsonwebtoken: any,
-        @Inject('cfg.auth.jwt') public jwt: any
+        @Inject('cfg.auth.jwt') public jwt: any,
       ) {}
     }
 

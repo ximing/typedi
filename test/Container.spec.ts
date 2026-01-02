@@ -171,20 +171,20 @@ describe('Container', function () {
       class ExtraService {
         constructor(
           public luckyNumber: number,
-          public message: string
+          public message: string,
         ) {}
       }
 
       Container.registerHandler({
         object: ExtraService,
         index: 0,
-        value: containerInstance => 777,
+        value: (containerInstance) => 777,
       });
 
       Container.registerHandler({
         object: ExtraService,
         index: 1,
-        value: containerInstance => 'hello parameter',
+        value: (containerInstance) => 'hello parameter',
       });
 
       expect(Container.get(ExtraService).luckyNumber).toBe(777);
@@ -197,7 +197,7 @@ describe('Container', function () {
           Container.registerHandler({
             object: target,
             propertyName: propertyName,
-            value: containerInstance => value,
+            value: (containerInstance) => value,
           });
         };
       }
@@ -222,7 +222,7 @@ describe('Container', function () {
             object: target,
             propertyName: propertyName,
             index: index,
-            value: containerInstance => value,
+            value: (containerInstance) => value,
           });
         };
       }

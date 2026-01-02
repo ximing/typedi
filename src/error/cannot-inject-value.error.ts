@@ -15,7 +15,7 @@ export class CannotInjectValueError extends Error {
 
   constructor(
     private target: Constructable<unknown>,
-    private propertyName: string
+    private propertyName: string,
   ) {
     super();
   }

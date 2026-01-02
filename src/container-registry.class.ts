@@ -1,5 +1,6 @@
 import { ContainerInstance } from './container-instance.class';
 import { ContainerIdentifier } from './types/container-identifier.type';
+import { ContainerOptions } from './interfaces/container-options.interface';
 
 /**
  * The container registry is responsible for holding the default and every
@@ -22,6 +23,23 @@ export class ContainerRegistry {
    * container when registered via `Container.set()` or `@Service` decorator.
    */
   public static readonly defaultContainer: ContainerInstance = new ContainerInstance('default');
+
+  /**
+   * Creates a container with the given ID, options, and optional parent.
+   *
+   * @param id The ID for the container
+   * @param options Optional container options
+   * @param parentId Optional parent container ID
+   */
+  public static create(
+    id: ContainerIdentifier,
+    options?: Partial<ContainerOptions>,
+    parentId?: ContainerIdentifier,
+  ): ContainerInstance {
+    const parent = parentId ? this.getContainer(parentId) : undefined;
+
+    return new ContainerInstance(id, options, parent);
+  }
 
   /**
    * Registers the given container instance or throws an error.

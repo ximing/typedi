@@ -67,7 +67,7 @@ class ExampleClass {
   constructor(
     @Inject()
     public withDecorator: InjectedExampleClass,
-    public withoutDecorator: InjectedExampleClass
+    public withoutDecorator: InjectedExampleClass,
   ) {}
 }
 
@@ -134,7 +134,7 @@ class ExampleClass {
      * regardless of what is the inferred type.
      */
     @Inject(() => BetterInjectedClass)
-    public explicitArgumentInjection: InjectedExampleClass
+    public explicitArgumentInjection: InjectedExampleClass,
   ) {}
 }
 

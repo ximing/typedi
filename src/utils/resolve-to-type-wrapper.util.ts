@@ -15,7 +15,7 @@ export function resolveToTypeWrapper(
   typeOrIdentifier: ((type?: never) => Constructable<unknown>) | ServiceIdentifier<unknown> | undefined,
   target: object,
   propertyName: string | symbol,
-  index?: number
+  index?: number,
 ): { eagerType: ServiceIdentifier | null; lazyType: (type?: never) => ServiceIdentifier } {
   /**
    * ? We want to error out as soon as possible when looking up services to inject, however

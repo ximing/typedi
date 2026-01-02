@@ -55,8 +55,8 @@ describe('Inject Decorator', function () {
     class TestServiceWithParameters {
       constructor(
         public testClass: TestService,
-        @Inject(type => SecondTestService) public secondTest: any,
-        @Inject('mega.service') public megaService: any
+        @Inject((type) => SecondTestService) public secondTest: any,
+        @Inject('mega.service') public megaService: any,
       ) {}
     }
     expect(Container.get(TestServiceWithParameters).testClass).toBeInstanceOf(TestService);
@@ -87,7 +87,7 @@ describe('Inject Decorator', function () {
 
     expect(Container.get(TestServiceWithParameters).cars).toHaveLength(3);
 
-    const carNames = Container.get(TestServiceWithParameters).cars.map(car => car.name);
+    const carNames = Container.get(TestServiceWithParameters).cars.map((car) => car.name);
     expect(carNames).toContain('BMW');
     expect(carNames).toContain('Mercedes');
     expect(carNames).toContain('Toyota');

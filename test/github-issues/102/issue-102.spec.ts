@@ -15,7 +15,7 @@ describe('Github Issues', function () {
       public constructor(
         @Inject('config')
         public cfg: any,
-        public injectedService: InjectedService
+        public injectedService: InjectedService,
       ) {}
     }
 

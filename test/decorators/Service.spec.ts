@@ -33,7 +33,7 @@ describe('Service Decorator', function () {
     class TestServiceWithParameters {
       constructor(
         public testClass: TestService,
-        public secondTest: SecondTestService
+        public secondTest: SecondTestService,
       ) {}
     }
     expect(Container.get(TestServiceWithParameters)).toBeInstanceOf(TestServiceWithParameters);
@@ -55,7 +55,7 @@ describe('Service Decorator', function () {
     class Car {
       constructor(
         public name: string,
-        public engine: Engine
+        public engine: Engine,
       ) {}
     }
 
@@ -83,7 +83,7 @@ describe('Service Decorator', function () {
       name: string;
       constructor(
         name: string,
-        public engine: Engine
+        public engine: Engine,
       ) {
         this.name = name;
       }

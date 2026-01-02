@@ -44,7 +44,7 @@ describe('Github Issues', function () {
     expect(scopedClassB).toStrictEqual(scopedClassA.classB);
 
     /** Two container should not share the exact same instances. */
-    expect(rootClassA).not.toStrictEqual(scopedClassA);
-    expect(rootClassB).not.toStrictEqual(scopedClassB);
+    expect(rootClassA).not.toBe(scopedClassA);
+    expect(rootClassB).not.toBe(scopedClassB);
   });
 });

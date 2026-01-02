@@ -44,14 +44,6 @@ export interface ServiceMetadata<Type = unknown> {
   multiple: boolean;
 
   /**
-   * Indicates whether a new instance should be created as soon as the class is registered.
-   * By default the registered classes are only instantiated when they are requested from the container.
-   *
-   * _Note: This option is ignored for transient services._
-   */
-  eager: boolean;
-
-  /**
    * Map of containers referencing this metadata. This is used when a container
    * is inheriting it's parents definitions and values to track the lifecycle of
    * the metadata. Namely, a service can be disposed only if it's only referenced
