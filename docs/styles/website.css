@@ -1,0 +1,106 @@
+/* 自定义样式 */
+
+/* 改善代码块显示 */
+.book .book-body .page-wrapper .page-inner section.normal code {
+  background-color: #f4f4f4;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+}
+
+/* 改善表格样式 */
+.book .book-body .page-wrapper .page-inner section.normal table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 15px 0;
+}
+
+.book .book-body .page-wrapper .page-inner section.normal table th,
+.book .book-body .page-wrapper .page-inner section.normal table td {
+  border: 1px solid #ddd;
+  padding: 8px 12px;
+  text-align: left;
+}
+
+.book .book-body .page-wrapper .page-inner section.normal table th {
+  background-color: #f8f8f8;
+  font-weight: bold;
+}
+
+.book .book-body .page-wrapper .page-inner section.normal table tr:hover {
+  background-color: #f5f5f5;
+}
+
+/* 改善标题样式 */
+.book .book-body .page-wrapper .page-inner section.normal h1 {
+  margin-top: 0;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #0366d6;
+}
+
+.book .book-body .page-wrapper .page-inner section.normal h2 {
+  margin-top: 24px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #eaecef;
+}
+
+/* 改善引用块样式 */
+.book .book-body .page-wrapper .page-inner section.normal blockquote {
+  border-left: 4px solid #0366d6;
+  padding: 0 15px;
+  color: #6a737d;
+  background-color: #f6f8fa;
+}
+
+/* 改善链接样式 */
+.book .book-body .page-wrapper .page-inner section.normal a {
+  color: #0366d6;
+  text-decoration: none;
+}
+
+.book .book-body .page-wrapper .page-inner section.normal a:hover {
+  text-decoration: underline;
+}
+
+/* 改善侧边栏 */
+.book .book-summary {
+  background-color: #fafafa;
+}
+
+.book .book-summary ul.summary li a {
+  padding: 8px 15px;
+}
+
+.book .book-summary ul.summary li.active > a {
+  color: #0366d6;
+  font-weight: bold;
+  background-color: #e8f4ff;
+  border-left: 3px solid #0366d6;
+}
+
+/* 改善代码块 */
+.book .book-body .page-wrapper .page-inner section.normal pre {
+  background-color: #1e1e1e;
+  border: none;
+  border-radius: 5px;
+  padding: 16px;
+  overflow-x: auto;
+}
+
+.book .book-body .page-wrapper .page-inner section.normal pre > code {
+  background-color: transparent;
+  padding: 0;
+  color: #d4d4d4;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .book .book-body .page-wrapper .page-inner section.normal table {
+    font-size: 14px;
+  }
+  
+  .book .book-body .page-wrapper .page-inner section.normal pre {
+    padding: 12px;
+    font-size: 13px;
+  }
+}

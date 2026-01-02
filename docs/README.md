@@ -67,18 +67,15 @@ class UserRepository {
 ```
 
 When you write tests you can easily provide your own "fake" dependencies to classes you are testing using `set` method:
-`provide` methods of the container:
 
 ```typescript
-Container.set(CoffeeMaker, new FakeCoffeeMaker());
+// 替换类实现
+Container.set({ id: CoffeeMaker, value: new FakeCoffeeMaker() });
 
-// or for named services
-
-Container.set([
-  { id: 'bean.factory', value: new FakeBeanFactory() },
-  { id: 'sugar.factory', value: new FakeSugarFactory() },
-  { id: 'water.factory', value: new FakeWaterFactory() },
-]);
+// 或者批量替换命名服务
+Container.set({ id: 'bean.factory', value: new FakeBeanFactory() });
+Container.set({ id: 'sugar.factory', value: new FakeSugarFactory() });
+Container.set({ id: 'water.factory', value: new FakeWaterFactory() });
 ```
 
 ## TypeScript Advanced Usage Examples
@@ -270,15 +267,9 @@ const factories = Container.getMany(FactoryToken); // factories is Factory[]
 factories.forEach((factory) => factory.create());
 ```
 
-### Using multiple containers and scoped containers
+### 使用多容器和作用域容器
 
-By default all services are stored in the global service container,
-and this global service container holds all unique instances of each service you have.
-
-If you want your services to behave and store data inside differently,
-based on some user context (http request for example) -
-you can use different containers for different contexts.
-For example:
+默认情况下,所有服务都存储在全局默认容器中。如果你希望服务根据不同的上下文(如 HTTP 请求)具有不同的行为和数据,可以为不同的上下文使用不同的容器。
 
 ```typescript
 // QuestionController.ts
@@ -298,30 +289,73 @@ export class QuestionRepository {
 }
 
 // app.ts
-const request1 = { param: 'question1' };
-const controller1 = Container.of(request1).get(QuestionController);
-controller1.save('Timber');
-Container.reset(request1);
+// 为每个请求创建独立容器
+const request1Container = Container.of('request-1');
+const controller1 = request1Container.get(QuestionController);
+controller1.save();
 
-const request2 = { param: 'question2' };
-const controller2 = Container.of(request2).get(QuestionController);
-controller2.save('');
-Container.reset(request2);
+// 请求完成后清理容器
+await request1Container.dispose();
+
+const request2Container = Container.of('request-2');
+const controller2 = request2Container.get(QuestionController);
+controller2.save();
+
+await request2Container.dispose();
 ```
 
-In this example `controller1` and `controller2` are completely different instances,
-and `QuestionRepository` used in those controllers are different instances as well.
+在这个例子中,`controller1` 和 `controller2` 是完全不同的实例,它们使用的 `QuestionRepository` 也是不同的实例。
 
-`Container.reset` removes container with the given context identifier.
-If you want your services to be completely global and not be container-specific,
-you can mark them as global:
+#### 服务作用域
+
+TypeDI 支持三种服务作用域:
+
+**Singleton**: 全局单例,所有容器共享同一实例
 
 ```typescript
-@Service({ global: true })
-export class QuestionUtils {}
+@Service({ scope: 'singleton' })
+export class ConfigService {
+  // 所有容器都会获得同一个实例
+}
 ```
 
-And this global service will be the same instance across all containers.
+**Container**: 容器作用域(默认),每个容器维护独立实例
+
+```typescript
+@Service({ scope: 'container' }) // 或 @Service()
+export class RequestContext {
+  // 每个容器有独立的实例
+}
+```
+
+**Transient**: 临时作用域,每次获取都创建新实例
+
+```typescript
+@Service({ scope: 'transient' })
+export class CommandHandler {
+  // 每次 Container.get() 都创建新实例
+}
+```
+
+#### 容器继承
+
+子容器可以继承父容器的服务:
+
+```typescript
+// 创建父容器并注册服务
+const parentContainer = Container.of('parent');
+parentContainer.set({ id: 'shared-config', value: { debug: true } });
+
+// 创建继承父容器的子容器
+const childContainer = parentContainer.of('child');
+
+// 子容器可以访问父容器的服务
+const config = childContainer.get('shared-config'); // ✓ 可以访问
+
+// 禁用继承
+const isolatedContainer = Container.of('isolated', { inherit: false });
+// isolatedContainer.get('shared-config'); // ✗ 抛出错误
+```
 
 TypeDI also supports a function dependency injection. Here is how it looks like:
 
@@ -359,8 +393,44 @@ const postController = Container.get(PostController);
 console.log(postController);
 ```
 
-### Remove registered services or reset container state
+### 移除注册的服务或重置容器状态
 
-If you need to remove registered service from container simply use `Container.remove(...)` method.
-Also you can completely reset the container by calling `Container.reset()` method.
-This will effectively remove all registered services from the container.
+如果需要从容器中移除已注册的服务,使用 `Container.remove()` 方法:
+
+```typescript
+import { Container, Service } from 'typedi';
+
+@Service()
+class TempService {
+  dispose() {
+    console.log('Cleaning up...');
+  }
+}
+
+Container.get(TempService);
+Container.remove(TempService); // 输出: Cleaning up...
+
+// 批量移除
+Container.remove([ServiceA, ServiceB, ServiceC]);
+```
+
+重置容器有两种策略:
+
+```typescript
+// 仅重置服务值,保留注册信息
+Container.reset({ strategy: 'resetValue' });
+
+// 完全清除所有服务注册
+Container.reset({ strategy: 'resetServices' });
+```
+
+销毁容器及其所有服务:
+
+```typescript
+const scopedContainer = Container.of('request-123');
+// 使用容器...
+
+// 完全销毁容器
+await scopedContainer.dispose();
+// 容器销毁后无法再使用
+```

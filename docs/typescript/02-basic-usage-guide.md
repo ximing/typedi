@@ -137,26 +137,168 @@ const stringIdentifierValueB = Container.get('my-dependency-name-B');
 
 _For detailed documentation about `Token` class please read the [Service Tokens](./06-service-tokens.md) page._
 
-## Singleton vs transient classes
+## 服务作用域:Singleton、Container 和 Transient
 
-Every registered service by default is a singleton. Meaning repeated calls to `Container.get(MyClass)` will return the
-same instance. If this is not the desired behavior a class can be marked as `transient` via the `@Service()` decorator.
+TypeDI 支持三种服务作用域,用于控制服务实例的生命周期和缓存行为:
+
+### Container 作用域(默认)
+
+默认情况下,每个服务都是容器作用域的。这意味着每个容器会维护独立的服务实例:
 
 ```ts
 import 'reflect-metadata';
-import { Container, Inject, Service } from 'typedi';
+import { Container, Service } from 'typedi';
 
-@Service({ scope: 'transient' })
-class ExampleTransientClass {
+@Service() // 等同于 @Service({ scope: 'container' })
+class UserService {
   constructor() {
-    console.log('I am being created!');
-    // this line will be printed twice
+    console.log('UserService created');
   }
 }
 
-const instanceA = Container.get(ExampleTransientClass);
-const instanceB = Container.get(ExampleTransientClass);
+// 在默认容器中获取
+const service1 = Container.get(UserService); // 输出: UserService created
+const service2 = Container.get(UserService); // 不输出(使用缓存的实例)
+console.log(service1 === service2); // true (同一容器内共享)
 
-console.log(instanceA !== instanceB);
-// prints true
+// 在不同的容器中获取
+const container1 = Container.of('request-1');
+const container2 = Container.of('request-2');
+
+const service3 = container1.get(UserService); // 输出: UserService created
+const service4 = container2.get(UserService); // 输出: UserService created
+console.log(service3 === service4); // false (不同容器独立实例)
+```
+
+**适用场景:**
+
+- HTTP 请求上下文
+- 用户会话管理
+- 事务处理
+- 需要容器级隔离的有状态服务
+
+### Singleton 作用域
+
+Singleton 服务在整个应用中只有一个实例,存储在根容器中,所有容器共享:
+
+```ts
+import 'reflect-metadata';
+import { Container, Service } from 'typedi';
+
+@Service({ scope: 'singleton' })
+class ConfigService {
+  constructor() {
+    console.log('ConfigService created');
+  }
+
+  getConfig() {
+    return { apiUrl: 'https://api.example.com' };
+  }
+}
+
+const config1 = Container.get(ConfigService); // 输出: ConfigService created
+const config2 = Container.get(ConfigService); // 不输出
+
+const container1 = Container.of('test-1');
+const container2 = Container.of('test-2');
+
+const config3 = container1.get(ConfigService); // 不输出
+const config4 = container2.get(ConfigService); // 不输出
+
+console.log(config1 === config2 && config2 === config3 && config3 === config4);
+// prints true (所有容器共享同一实例)
+```
+
+**适用场景:**
+
+- 应用配置
+- 数据库连接池
+- 日志记录器
+- 缓存管理器
+- 无状态工具类
+
+### Transient 作用域
+
+Transient 服务每次调用 `Container.get()` 都会创建新实例,不缓存:
+
+```ts
+import 'reflect-metadata';
+import { Container, Service } from 'typedi';
+
+@Service({ scope: 'transient' })
+class CommandHandler {
+  constructor() {
+    console.log('CommandHandler created');
+  }
+}
+
+const handler1 = Container.get(CommandHandler); // 输出: CommandHandler created
+const handler2 = Container.get(CommandHandler); // 输出: CommandHandler created
+
+console.log(handler1 !== handler2);
+// prints true (每次都是新实例)
+```
+
+**适用场景:**
+
+- 命令对象模式
+- 原型模式
+- 需要完全隔离状态的服务
+- 一次性任务处理器
+
+### 作用域对比
+
+| 特性       | Singleton | Container    | Transient    |
+| ---------- | --------- | ------------ | ------------ |
+| 实例数量   | 全局唯一  | 每个容器一个 | 每次创建新的 |
+| 缓存位置   | 根容器    | 当前容器     | 不缓存       |
+| 跨容器共享 | 是        | 否           | 否           |
+| 性能       | 最快      | 中等         | 较慢         |
+| 状态隔离   | 全局共享  | 容器级隔离   | 完全隔离     |
+
+### 选择合适的作用域
+
+```ts
+import 'reflect-metadata';
+import { Container, Service, Inject } from 'typedi';
+
+// Singleton: 应用配置
+@Service({ scope: 'singleton' })
+class AppConfig {
+  readonly apiUrl = 'https://api.example.com';
+  readonly timeout = 5000;
+}
+
+// Container: 请求上下文
+@Service({ scope: 'container' })
+class RequestContext {
+  constructor(public requestId: string = Math.random().toString()) {}
+}
+
+// Transient: 一次性命令
+@Service({ scope: 'transient' })
+class SendEmailCommand {
+  execute(to: string, subject: string) {
+    console.log(`Sending email to ${to}: ${subject}`);
+  }
+}
+
+// 组合使用
+@Service()
+class UserController {
+  constructor(
+    private config: AppConfig, // 全局共享的配置
+    private context: RequestContext, // 请求级的上下文
+    private emailCmd: SendEmailCommand, // 每次都是新的命令实例
+  ) {}
+
+  sendWelcomeEmail() {
+    console.log(`Request ID: ${this.context.requestId}`);
+    console.log(`API URL: ${this.config.apiUrl}`);
+    this.emailCmd.execute('user@example.com', 'Welcome!');
+  }
+}
+
+const controller = Container.get(UserController);
+controller.sendWelcomeEmail();
 ```

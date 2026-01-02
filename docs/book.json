@@ -1,0 +1,66 @@
+{
+  "title": "TypeDI Documentation",
+  "description": "Dependency injection for TypeScript and JavaScript",
+  "author": "TypeStack contributors",
+  "language": "zh-hans",
+  "gitbook": ">=3.2.3",
+  "structure": {
+    "readme": "README.md",
+    "summary": "SUMMARY.md"
+  },
+  "plugins": [
+    "github",
+    "editlink",
+    "prism",
+    "-highlight",
+    "language-switcher",
+    "anchors",
+    "search-plus",
+    "-lunr",
+    "-search",
+    "splitter",
+    "back-to-top-button",
+    "copy-code-button",
+    "code",
+    "expandable-chapters",
+    "theme-comscore"
+  ],
+  "pluginsConfig": {
+    "github": {
+      "url": "https://github.com/ximing/typedi"
+    },
+    "editlink": {
+      "base": "https://github.com/ximing/typedi/edit/develop/docs",
+      "label": "编辑本页"
+    },
+    "prism": {
+      "css": ["prismjs/themes/prism-tomorrow.css"],
+      "lang": {
+        "shell": "bash"
+      }
+    },
+    "theme-default": {
+      "showLevel": true
+    },
+    "fontsettings": {
+      "theme": "white",
+      "family": "sans",
+      "size": 2
+    },
+    "sharing": {
+      "facebook": false,
+      "twitter": true,
+      "github": true,
+      "all": ["facebook", "twitter", "github", "weibo"]
+    }
+  },
+  "links": {
+    "sidebar": {
+      "GitHub": "https://github.com/ximing/typedi",
+      "npm": "https://www.npmjs.com/package/@rabjs/typedi"
+    }
+  },
+  "styles": {
+    "website": "styles/website.css"
+  }
+}
