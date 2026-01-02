@@ -8,4 +8,11 @@ export class Token<T> {
    * @param name Token name, optional and only used for debugging purposes.
    */
   constructor(public name?: string) {}
+
+  /**
+   * Returns a string representation of the token.
+   */
+  public toString(): string {
+    return this.name || 'Token';
+  }
 }

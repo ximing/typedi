@@ -8,14 +8,14 @@ import { ServiceIdentifier } from '../types/service-identifier.type';
 /**
  * Injects a list of services into a class property or constructor parameter.
  */
-export function InjectMany(): Function;
-export function InjectMany(type?: (type?: any) => Function): Function;
-export function InjectMany(serviceName?: string): Function;
-export function InjectMany(token: Token<any>): Function;
+export function InjectMany(): PropertyDecorator & ParameterDecorator;
+export function InjectMany(type?: (type?: any) => Constructable<unknown>): PropertyDecorator & ParameterDecorator;
+export function InjectMany(serviceName?: string): PropertyDecorator & ParameterDecorator;
+export function InjectMany(token: Token<any>): PropertyDecorator & ParameterDecorator;
 export function InjectMany(
   typeOrIdentifier?: ((type?: never) => Constructable<unknown>) | ServiceIdentifier<unknown>,
-): Function {
-  return function (target: object, propertyName: string | symbol, index?: number): void {
+): PropertyDecorator & ParameterDecorator {
+  return function (target: object, propertyName?: string | symbol, index?: number): void {
     const typeWrapper = resolveToTypeWrapper(typeOrIdentifier, target, propertyName, index);
 
     /** If no type was inferred, or the general Object type was inferred we throw an error. */

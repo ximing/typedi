@@ -39,10 +39,11 @@
     "prepare": "husky"
   },
   "lint-staged": {
-    "*.md": [
+    "*.{json,md}": [
       "pnpm run prettier:fix"
     ],
     "*.ts": [
+      "pnpm run lint:fix",
       "pnpm run prettier:fix"
     ]
   },

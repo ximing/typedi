@@ -81,14 +81,14 @@ export class ContainerInstance {
     if (this.cachedRootContainer) {
       return this.cachedRootContainer;
     }
-
-    let current: ContainerInstance = this;
-    while (current.parentContainer) {
-      current = current.parentContainer;
+    // eslint-disable-next-line  @typescript-eslint/no-this-alias
+    let root: ContainerInstance = this;
+    while (root.parentContainer) {
+      root = root.parentContainer;
     }
 
-    this.cachedRootContainer = current;
-    return current;
+    this.cachedRootContainer = root;
+    return root;
   }
 
   /**
@@ -178,7 +178,6 @@ export class ContainerInstance {
       // If it's singleton, should already be handled in step 3
       // Check again for defensive programming
       if (parentMetadata.scope === 'singleton') {
-        const root = this.getRoot();
         return this.getServiceValue(parentMetadata);
       }
 
@@ -271,7 +270,13 @@ export class ContainerInstance {
 
     /** If the incoming metadata is marked as multiple we mask the ID and continue saving as single value. */
     if (serviceOptions.multiple) {
-      const maskedToken = new Token(`MultiMaskToken-${newMetadata.id.toString()}`);
+      const idString =
+        typeof newMetadata.id === 'string'
+          ? newMetadata.id
+          : newMetadata.id instanceof Token
+            ? newMetadata.id.toString()
+            : (newMetadata.id as { name?: string }).name || 'unknown';
+      const maskedToken = new Token(`MultiMaskToken-${idString}`);
       const existingMultiGroup = this.multiServiceIds.get(newMetadata.id);
 
       if (existingMultiGroup) {
@@ -377,7 +382,7 @@ export class ContainerInstance {
    * Helper method that imports given services.
    */
 
-  public import(services: Function[]): ContainerInstance {
+  public import(services: Array<Record<string, any>>): ContainerInstance {
     this.throwIfDisposed();
 
     return this;
@@ -539,7 +544,7 @@ export class ContainerInstance {
   /**
    * Initializes all parameter types for a given target service class.
    */
-  private initializeParams(target: Function, paramTypes: any[]): unknown[] {
+  private initializeParams(target: Record<string, any>, paramTypes: any[]): unknown[] {
     return paramTypes.map((paramType, index) => {
       // 1. Check local container
       let paramHandler = this.handlers.find((handler) => handler.object === target && handler.index === index);
@@ -580,7 +585,7 @@ export class ContainerInstance {
   /**
    * Recursively searches for a handler in parent containers.
    */
-  private findHandlerInParent(target: Function, index: number): Handler | undefined {
+  private findHandlerInParent(target: Record<string, any>, index: number): Handler | undefined {
     if (!this.parentContainer) return undefined;
 
     const handler = this.parentContainer.handlers.find((h) => h.object === target && h.index === index);
@@ -593,7 +598,7 @@ export class ContainerInstance {
   /**
    * Applies all registered handlers on a given target class.
    */
-  private applyPropertyHandlers(target: Function, instance: { [key: string]: any }) {
+  private applyPropertyHandlers(target: Record<string, any>, instance: { [key: string]: any }) {
     this.handlers.forEach((handler) => {
       if (typeof handler.index === 'number') return;
       if (handler.object.constructor !== target && !(target.prototype instanceof handler.object.constructor)) return;
@@ -631,7 +636,7 @@ export class ContainerInstance {
       ) {
         try {
           (serviceMetadata.value as { dispose: CallableFunction }).dispose();
-        } catch (error) {
+        } catch {
           /** We simply ignore the errors from the dispose function. */
         }
       }
