@@ -1,6 +1,6 @@
 {
   "name": "@rabjs/typedi",
-  "version": "0.10.3",
+  "version": "0.10.4",
   "description": "Dependency injection for TypeScript.",
   "author": "TypeStack contributors",
   "license": "MIT",
