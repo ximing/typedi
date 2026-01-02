@@ -6,9 +6,9 @@ coverage:
     project:
       default:
         threshold: 0%
-        paths: 
+        paths:
           - src/**/*.ts
 comment: off
 ignore:
-  - testing/**/*.ts
+  - test/**/*.ts
   - src/**/*.interface.ts
