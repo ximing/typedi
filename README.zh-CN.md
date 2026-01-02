@@ -4,48 +4,48 @@
 [![codecov](https://codecov.io/gh/ximing/typedi/branch/develop/graph/badge.svg)](https://codecov.io/gh/ximing/typedi)
 [![npm version](https://badge.fury.io/js/%40rabjs%2Ftypedi.svg)](https://badge.fury.io/js/%40rabjs%2Ftypedi)
 
-[中文文档](./README.zh-CN.md) | English
+中文文档 | [English](./README.md)
 
-TypeDI is a [dependency injection](https://en.wikipedia.org/wiki/Dependency_injection) tool for TypeScript and JavaScript. It helps you build well-structured and easily testable applications in Node or browser environments.
+TypeDI 是一个为 TypeScript 和 JavaScript 设计的[依赖注入](https://en.wikipedia.org/wiki/Dependency_injection)工具。它能帮助你在 Node 或浏览器环境中构建结构清晰、易于测试的应用程序。
 
-## Features
+## 主要特性
 
-- 🎯 **Property and Constructor Injection** - Flexible dependency injection approaches
-- 🔄 **Multiple Service Scopes** - Support for singleton, container, and transient lifecycles
-- 📦 **Multiple Containers** - Container inheritance and isolation for multi-tenant and request isolation scenarios
-- 🔍 **Token Support** - Type-safe interface injection using Tokens
-- 🌲 **Container Inheritance** - Multi-level container inheritance with flexible service resolution
-- 🎭 **Multiple Service Instances** - Register multiple implementations under the same identifier
+- 🎯 **属性注入和构造函数注入** - 灵活的依赖注入方式
+- 🔄 **多种服务作用域** - 支持 singleton、container 和 transient 三种生命周期
+- 📦 **多容器支持** - 支持容器继承和隔离，适用于多租户、请求隔离等场景
+- 🔍 **Token 支持** - 使用 Token 进行类型安全的接口注入
+- 🌲 **容器继承** - 支持多层级容器继承，灵活的服务查询机制
+- 🎭 **多实例服务** - 同一标识符下注册多个服务实现
 
-## Installation
+## 安装
 
-Install the required packages via npm:
+使用 npm 安装所需的包：
 
 ```bash
 npm install @rabjs/typedi reflect-metadata
 ```
 
-Import `reflect-metadata` at the **first line** of your application:
+在你的应用程序**第一行**导入 `reflect-metadata`：
 
 ```ts
 import 'reflect-metadata';
 
-// Your other imports and initialization code
-// comes here after you imported the reflect-metadata package
+// 在导入 reflect-metadata 之后
+// 再进行其他导入和初始化代码
 ```
 
-Enable decorator metadata in your `tsconfig.json` under `compilerOptions`:
+在 `tsconfig.json` 的 `compilerOptions` 中启用装饰器元数据：
 
 ```json
 "emitDecoratorMetadata": true,
 "experimentalDecorators": true,
 ```
 
-Now you're ready to use TypeDI!
+现在你已准备好使用 TypeDI！
 
-## Basic Usage
+## 基础用法
 
-### Simple Service Injection
+### 简单的服务注入
 
 ```ts
 import { Container, Service } from '@rabjs/typedi';
@@ -60,17 +60,17 @@ class ExampleInjectedService {
 @Service()
 class ExampleService {
   constructor(
-    // TypeDI will automatically inject an instance of ExampleInjectedService
+    // TypeDI 会自动注入 ExampleInjectedService 的实例
     public injectedService: ExampleInjectedService,
   ) {}
 }
 
 const serviceInstance = Container.get(ExampleService);
 serviceInstance.injectedService.printMessage();
-// Output: "I am alive!"
+// 输出: "I am alive!"
 ```
 
-### Property Injection
+### 属性注入
 
 ```ts
 import { Container, Service, Inject } from '@rabjs/typedi';
@@ -89,7 +89,7 @@ class UserService {
 
   getUsers() {
     this.database.connect();
-    // User fetching logic...
+    // 获取用户逻辑...
   }
 }
 
@@ -97,7 +97,7 @@ const userService = Container.get(UserService);
 userService.getUsers();
 ```
 
-### Interface Injection with Tokens
+### 使用 Token 进行接口注入
 
 ```ts
 import { Container, Service, Inject, Token } from '@rabjs/typedi';
@@ -115,7 +115,7 @@ class ConsoleLogger implements Logger {
   }
 }
 
-// Register the service
+// 注册服务
 Container.set({ id: LoggerToken, type: ConsoleLogger });
 
 @Service()
@@ -128,26 +128,26 @@ class UserService {
 }
 ```
 
-### Service Scopes
+### 服务作用域
 
-TypeDI supports three service scopes:
+TypeDI 支持三种服务作用域：
 
 ```ts
 import { Container, Service } from '@rabjs/typedi';
 
-// Singleton - Global singleton, shared across all containers
+// Singleton - 全局单例，所有容器共享同一实例
 @Service({ scope: 'singleton' })
 class ConfigService {
   appName = 'MyApp';
 }
 
-// Container - Container scoped (default), one instance per container
+// Container - 容器作用域（默认），每个容器一个实例
 @Service({ scope: 'container' })
 class RequestContext {
   requestId = Math.random();
 }
 
-// Transient - Create a new instance on each request
+// Transient - 瞬态，每次获取都创建新实例
 @Service({ scope: 'transient' })
 class TempData {
   timestamp = Date.now();
@@ -159,14 +159,14 @@ console.log(config1 === config2); // true - singleton
 
 const context1 = Container.get(RequestContext);
 const context2 = Container.get(RequestContext);
-console.log(context1 === context2); // true - reused within the same container
+console.log(context1 === context2); // true - 同一容器内复用
 
 const temp1 = Container.get(TempData);
 const temp2 = Container.get(TempData);
-console.log(temp1 === temp2); // false - new instance each time
+console.log(temp1 === temp2); // false - 每次都是新实例
 ```
 
-### Multiple Containers and Inheritance
+### 多容器和容器继承
 
 ```ts
 import { Container, Service } from '@rabjs/typedi';
@@ -185,26 +185,26 @@ class DatabaseService {
   }
 }
 
-// Create separate containers for each HTTP request (automatically inherits from default container)
+// 为每个 HTTP 请求创建独立容器（自动继承默认容器）
 const request1Container = Container.of('request-1');
 const request2Container = Container.of('request-2');
 
-// Each request container has its own Database instance
+// 每个请求容器有独立的 Database 实例
 const db1 = request1Container.get(DatabaseService);
 const db2 = request2Container.get(DatabaseService);
-console.log(db1 === db2); // false - different instances for different containers
+console.log(db1 === db2); // false - 不同容器的不同实例
 
-// But share the same Logger instance (singleton)
+// 但共享同一个 Logger 实例（singleton）
 const logger1 = request1Container.get(LoggerService);
 const logger2 = request2Container.get(LoggerService);
-console.log(logger1 === logger2); // true - shared across all containers
+console.log(logger1 === logger2); // true - 所有容器共享
 
-// Cleanup request containers
+// 清理请求容器
 await request1Container.dispose();
 await request2Container.dispose();
 ```
 
-### Multiple Service Instances
+### 多实例服务
 
 ```ts
 import { Container, Service, Token, InjectMany } from '@rabjs/typedi';
@@ -229,11 +229,11 @@ class PluginB implements Plugin {
   }
 }
 
-// Get all plugins
+// 获取所有插件
 const plugins = Container.getMany<Plugin>(PluginToken);
 plugins.forEach((plugin) => plugin.execute());
 
-// Or use InjectMany decorator
+// 或使用 InjectMany 装饰器
 @Service()
 class PluginManager {
   @InjectMany(() => PluginToken)
@@ -245,14 +245,14 @@ class PluginManager {
 }
 ```
 
-### Factory Functions
+### 工厂函数
 
 ```ts
 import { Container, Service, Token, ContainerInstance } from '@rabjs/typedi';
 
 const DatabaseToken = new Token<Database>('database');
 
-// Use a factory function to create the service
+// 使用工厂函数创建服务
 Container.set({
   id: DatabaseToken,
   factory: (container) => {
@@ -261,7 +261,7 @@ Container.set({
   },
 });
 
-// Use a class method as factory
+// 使用类方法作为工厂
 @Service()
 class DatabaseFactory {
   create(container: ContainerInstance) {
@@ -275,26 +275,26 @@ Container.set({
 });
 ```
 
-## Advanced Usage
+## 高级用法
 
-### Container Inheritance Options
+### 容器继承选项
 
 ```ts
 import { Container, ContainerInstance } from '@rabjs/typedi';
 
-// Create a completely isolated container (does not inherit parent's services)
+// 创建完全隔离的容器（不继承父容器的服务）
 const isolatedContainer = new ContainerInstance('isolated', { inherit: false });
 
-// Create a container that inherits from parent (default behavior)
+// 创建继承父容器的容器（默认行为）
 const parentContainer = new ContainerInstance('parent');
 const childContainer = new ContainerInstance('child', { inherit: true }, parentContainer);
 
-// child can access parent's services
+// child 可以访问 parent 的服务
 parentContainer.set({ id: 'SharedService', type: SharedService });
-const service = childContainer.get('SharedService'); // ✅ accessible
+const service = childContainer.get('SharedService'); // ✅ 可以访问
 ```
 
-### Service Reset and Cleanup
+### 服务重置和清理
 
 ```ts
 import { Container, Service } from '@rabjs/typedi';
@@ -303,42 +303,42 @@ import { Container, Service } from '@rabjs/typedi';
 class CacheService {
   data = new Map();
 
-  // Implement dispose method, will be called automatically on container cleanup
+  // 实现 dispose 方法，容器清理时会自动调用
   dispose() {
     this.data.clear();
     console.log('Cache cleared');
   }
 }
 
-// Reset service values (keep registration info)
+// 重置服务值（保留注册信息）
 Container.reset({ strategy: 'resetValue' });
 
-// Completely clear services (including registration info)
+// 完全清除服务（包括注册信息）
 Container.reset({ strategy: 'resetServices' });
 
-// Cleanup container
+// 清理容器
 await Container.dispose();
 ```
 
-### Manual Service Registration
+### 手动注册服务
 
 ```ts
 import { Container, Token } from '@rabjs/typedi';
 
-// Register a class
+// 注册类
 Container.set({ id: 'MyService', type: MyService });
 
-// Register a value
+// 注册值
 Container.set({ id: 'API_KEY', value: 'secret-key-123' });
 
-// Use Token
+// 使用 Token
 const ConfigToken = new Token<Config>('config');
 Container.set({
   id: ConfigToken,
   value: { apiUrl: 'https://api.example.com' },
 });
 
-// Custom scope
+// 自定义作用域
 Container.set({
   id: 'Logger',
   type: ConsoleLogger,
@@ -346,44 +346,44 @@ Container.set({
 });
 ```
 
-## API Documentation
+## API 文档
 
 ### Container (ContainerInstance)
 
-- `get<T>(identifier: ServiceIdentifier<T>): T` - Get a service instance
-- `getMany<T>(identifier: ServiceIdentifier<T>): T[]` - Get multiple service instances
-- `set<T>(options: ServiceOptions<T>): this` - Register a service
-- `has<T>(identifier: ServiceIdentifier<T>): boolean` - Check if a service exists
-- `remove(identifier: ServiceIdentifier | ServiceIdentifier[]): this` - Remove service(s)
-- `of(id: ContainerIdentifier, options?, parentId?): ContainerInstance` - Create or get a child container
-- `reset(options?: { strategy: 'resetValue' | 'resetServices' }): this` - Reset container
-- `dispose(): Promise<void>` - Cleanup container
+- `get<T>(identifier: ServiceIdentifier<T>): T` - 获取服务实例
+- `getMany<T>(identifier: ServiceIdentifier<T>): T[]` - 获取多个服务实例
+- `set<T>(options: ServiceOptions<T>): this` - 注册服务
+- `has<T>(identifier: ServiceIdentifier<T>): boolean` - 检查服务是否存在
+- `remove(identifier: ServiceIdentifier | ServiceIdentifier[]): this` - 移除服务
+- `of(id: ContainerIdentifier, options?, parentId?): ContainerInstance` - 创建或获取子容器
+- `reset(options?: { strategy: 'resetValue' | 'resetServices' }): this` - 重置容器
+- `dispose(): Promise<void>` - 清理容器
 
-### Decorators
+### 装饰器
 
-- `@Service(options?: ServiceOptions)` - Mark a class as an injectable service
-- `@Inject(typeOrToken?)` - Inject a dependency into a property or constructor parameter
-- `@InjectMany(typeOrToken?)` - Inject multiple service instances
+- `@Service(options?: ServiceOptions)` - 标记类为可注入的服务
+- `@Inject(typeOrToken?)` - 注入依赖到属性或构造函数参数
+- `@InjectMany(typeOrToken?)` - 注入多个服务实例
 
-### Types
+### 类型
 
-- `ServiceIdentifier<T>` - Service identifier (class, string, or Token)
-- `ContainerScope` - Service scope: 'singleton' | 'container' | 'transient'
-- `ServiceOptions<T>` - Service configuration options
-- `Token<T>` - Type-safe service identifier
+- `ServiceIdentifier<T>` - 服务标识符（类、字符串或 Token）
+- `ContainerScope` - 服务作用域：'singleton' | 'container' | 'transient'
+- `ServiceOptions<T>` - 服务配置选项
+- `Token<T>` - 类型安全的服务标识符
 
-## Documentation
+## 文档
 
-Detailed usage guides and API documentation can be found at:
+详细的使用指南和 API 文档可以在以下位置找到：
 
-- [Online Documentation][docs-stable]
-- The `./docs` directory in the project repository
+- [在线文档][docs-stable]
+- 项目仓库的 `./docs` 目录
 
 [docs-stable]: https://docs.typestack.community/typedi/
 
-## Contributing
+## 贡献
 
-Please read our [Contributing Guide](./CONTRIBUTING.md) to get started.
+请阅读我们的[贡献指南](./CONTRIBUTING.md)开始贡献。
 
 ## License
 
