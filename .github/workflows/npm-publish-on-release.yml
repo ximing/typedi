@@ -1,4 +1,4 @@
-name: CD
+name: npm-publish-on-release
 on:
   release:
     types: [created]
