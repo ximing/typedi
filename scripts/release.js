@@ -30,11 +30,12 @@ const print = {
 // Execute command and return output
 function exec(command, options = {}) {
   try {
-    return execSync(command, {
+    const result = execSync(command, {
       encoding: 'utf8',
       stdio: options.silent ? 'pipe' : 'inherit',
       ...options,
-    }).trim();
+    });
+    return result ? result.trim() : '';
   } catch (error) {
     if (!options.ignoreError) {
       throw error;
@@ -120,12 +121,7 @@ async function release() {
 
     // Check current branch
     const currentBranch = getCurrentBranch();
-    if (
-      currentBranch !== 'develop' ||
-      currentBranch !== 'release' ||
-      currentBranch !== 'main' ||
-      currentBranch !== 'master'
-    ) {
+    if (!['develop', 'release', 'main', 'master'].includes(currentBranch)) {
       print.warning(`You are on branch '${currentBranch}', not 'develop' or 'release' or 'main' or 'master'`);
       const shouldContinue = await askQuestion('Continue anyway? (y/N) ');
       if (!shouldContinue) {
