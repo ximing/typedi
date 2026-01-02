@@ -1,4 +1,3 @@
-
 name: CD
 on:
   release:
@@ -9,22 +8,26 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 10.22.0
       - uses: actions/setup-node@v2
         with:
           node-version: 'lts/*'
           registry-url: https://registry.npmjs.org
-      - run: npm ci --ignore-scripts
-      - run: npm run prettier:check
-      - run: npm run lint:check
-      - run: npm run test:ci
-      - run: npm run build:es2015
-      - run: npm run build:esm5
-      - run: npm run build:cjs
-      - run: npm run build:umd
-      - run: npm run build:types
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run prettier:check
+      - run: pnpm run lint:check
+      - run: pnpm run test:ci
+      - run: pnpm run build:es2015
+      - run: pnpm run build:esm5
+      - run: pnpm run build:cjs
+      - run: pnpm run build:umd
+      - run: pnpm run build:types
       - run: cp LICENSE build/LICENSE
       - run: cp README.md build/README.md
       - run: jq 'del(.devDependencies) | del(.scripts)' package.json > build/package.json
-      - run: npm publish ./build
+      - run: pnpm publish ./build
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN }}
