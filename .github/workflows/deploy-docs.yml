@@ -1,4 +1,4 @@
-name: Deploy Documentation
+name: Deploy Documentation (Docusaurus)
 
 on:
   push:
@@ -6,8 +6,7 @@ on:
       - main
       - develop
     paths:
-      - 'docs/**'
-      - '.gitbook.yaml'
+      - 'website/**'
       - '.github/workflows/deploy-docs.yml'
   workflow_dispatch:
 
@@ -37,24 +36,17 @@ jobs:
         with:
           node-version: '18'
           cache: 'pnpm'
+          cache-dependency-path: 'website/pnpm-lock.yaml'
 
       - name: Install dependencies
-        run: pnpm install
-
-      - name: Install GitBook CLI
         run: |
-          npm install -g gitbook-cli
-          gitbook fetch latest
+          cd website
+          pnpm install
 
-      - name: Install GitBook plugins
+      - name: Build Docusaurus
         run: |
-          cd docs
-          gitbook install
-
-      - name: Build GitBook
-        run: |
-          cd docs
-          gitbook build
+          cd website
+          pnpm build
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
@@ -62,7 +54,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: './docs/_book'
+          path: './website/build'
 
   deploy:
     environment:

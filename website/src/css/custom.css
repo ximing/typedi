@@ -1,0 +1,191 @@
+/**
+ * TypeDI Documentation Custom Styles
+ * Migrated from GitBook styles to preserve the original design
+ */
+
+/* Custom CSS variables to match GitBook theme */
+:root {
+  /* Primary blue color from GitBook theme */
+  --ifm-color-primary: #0366d6;
+  --ifm-color-primary-dark: #0258c2;
+  --ifm-color-primary-darker: #0253b8;
+  --ifm-color-primary-darkest: #024395;
+  --ifm-color-primary-light: #0974ea;
+  --ifm-color-primary-lighter: #0e79f4;
+  --ifm-color-primary-lightest: #2188ff;
+
+  /* Code and syntax highlighting */
+  --ifm-code-font-size: 95%;
+  --ifm-code-background: #f4f4f4;
+  --ifm-code-color: inherit;
+  --ifm-code-padding-horizontal: 6px;
+  --ifm-code-padding-vertical: 2px;
+  --ifm-code-border-radius: 3px;
+
+  /* Font family */
+  --ifm-font-family-monospace: 'Consolas', 'Monaco', 'Courier New', monospace;
+
+  /* Highlighted code line background */
+  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
+
+  /* Sidebar */
+  --ifm-sidebar-background: #fafafa;
+}
+
+/* Dark theme adjustments */
+[data-theme='dark'] {
+  --ifm-color-primary: #2188ff;
+  --ifm-color-primary-dark: #0974ea;
+  --ifm-color-primary-darker: #0e79f4;
+  --ifm-color-primary-darkest: #0258c2;
+  --ifm-color-primary-light: #3d96ff;
+  --ifm-color-primary-lighter: #57a3ff;
+  --ifm-color-primary-lightest: #85b8ff;
+
+  /* Code blocks in dark theme */
+  --ifm-code-background: #1e1e1e;
+  --ifm-code-color: #d4d4d4;
+  --docusaurus-highlighted-code-line-bg: rgba(255, 255, 255, 0.1);
+}
+
+/* Improved code block styling - matching GitBook's dark theme */
+.theme-code-block {
+  --prism-background-color: #1e1e1e;
+}
+
+[data-theme='dark'] .theme-code-block {
+  --prism-background-color: #1e1e1e;
+}
+
+.theme-code-block pre {
+  background-color: #1e1e1e !important;
+  border: none;
+  border-radius: 5px;
+  padding: 16px;
+  overflow-x: auto;
+}
+
+.theme-code-block pre > code {
+  background-color: transparent;
+  padding: 0;
+  color: #d4d4d4;
+}
+
+/* Inline code styling */
+code:not(.theme-code-block code) {
+  background-color: var(--ifm-code-background);
+  padding: var(--ifm-code-padding-vertical) var(--ifm-code-padding-horizontal);
+  border-radius: var(--ifm-code-border-radius);
+  font-family: var(--ifm-font-family-monospace);
+  color: var(--ifm-code-color);
+}
+
+/* Table styling - matching GitBook */
+.markdown table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 15px 0;
+}
+
+.markdown table th,
+.markdown table td {
+  border: 1px solid var(--ifm-table-border-color);
+  padding: 8px 12px;
+  text-align: left;
+}
+
+.markdown table th {
+  background-color: var(--ifm-table-head-background);
+  font-weight: bold;
+}
+
+.markdown table tr:hover {
+  background-color: var(--ifm-table-row-hover-background);
+}
+
+/* Heading styling - matching GitBook */
+.markdown h1 {
+  margin-top: 0;
+  padding-bottom: 10px;
+  border-bottom: 2px solid var(--ifm-color-primary);
+}
+
+.markdown h2 {
+  margin-top: 24px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--ifm-color-emphasis-300);
+}
+
+/* Blockquote styling - matching GitBook */
+.markdown blockquote {
+  border-left: 4px solid var(--ifm-color-primary);
+  padding: 0 15px;
+  color: var(--ifm-color-emphasis-700);
+  background-color: var(--ifm-color-emphasis-100);
+  margin: 16px 0;
+}
+
+/* Link styling */
+.markdown a {
+  color: var(--ifm-color-primary);
+  text-decoration: none;
+}
+
+.markdown a:hover {
+  text-decoration: underline;
+}
+
+/* Sidebar styling */
+.theme-doc-sidebar-container {
+  background-color: var(--ifm-sidebar-background);
+}
+
+.theme-doc-sidebar-item-link--active {
+  color: var(--ifm-color-primary) !important;
+  font-weight: bold;
+  background-color: #e8f4ff;
+  border-left: 3px solid var(--ifm-color-primary);
+}
+
+.theme-doc-sidebar-item-link {
+  padding: 8px 15px;
+}
+
+/* Responsive design adjustments */
+@media (max-width: 768px) {
+  .markdown table {
+    font-size: 14px;
+  }
+
+  .theme-code-block pre {
+    padding: 12px;
+    font-size: 13px;
+  }
+}
+
+/* Copy code button styling */
+.theme-code-block .clean-btn {
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #d4d4d4;
+}
+
+.theme-code-block .clean-btn:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Navbar adjustments */
+.navbar {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Footer adjustments */
+.footer {
+  background-color: var(--ifm-footer-background-color);
+  color: var(--ifm-footer-color);
+}
+
+/* Ensure proper Chinese font rendering */
+html[lang="zh-Hans"] {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
