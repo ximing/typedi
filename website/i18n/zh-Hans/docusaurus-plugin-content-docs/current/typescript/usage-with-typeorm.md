@@ -1,13 +1,12 @@
 ---
 id: usage-with-typeorm
-title: Usage with TypeORM and routing-controllers
-sidebar_label: Usage with TypeORM and routing-controllers
+title: 与 TypeORM 和 routing-controllers 一起使用
+sidebar_label: 与 TypeORM 和 routing-controllers 一起使用
 ---
 
-# Usage with TypeORM and routing-controllers
+# 与 TypeORM 和 routing-controllers 一起使用
 
-To use TypeDI with routing-controllers and/or TypeORM, it's required to configure them to use the top-level
-TypeDI container used by your application.
+要将 TypeDI 与 routing-controllers 和/或 TypeORM 一起使用，需要配置它们使用应用程序使用的顶级 TypeDI 容器。
 
 ```ts
 import { useContainer as rcUseContainer } from 'routing-controllers';

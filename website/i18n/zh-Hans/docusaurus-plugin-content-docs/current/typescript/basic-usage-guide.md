@@ -1,26 +1,23 @@
 ---
 id: basic-usage-guide
-title: Basic Usage
-sidebar_label: Basic Usage
+title: 基本用法指南
+sidebar_label: 基本用法
 ---
 
-# Basic Usage
+# 基本用法指南
 
-> **IMPORTANT NOTE:**  
-> Don't forget to **annotate your classes with the `@Service` decorator**! Both the ones being injected and those which
-> requests the dependencies should be annotated.
+> **重要提示:**
+> 不要忘记**使用 `@Service` 装饰器注解你的类**！被注入的类和请求依赖的类都应该被注解。
 
-## Registering dependencies
+## 注册依赖
 
-There are three ways to register your dependencies:
+有三种方式来注册你的依赖：
 
-- annotating a class with the `@Service()` decorator ([documentation](./service-decorator.md))
-- registering a value with a `Token`
-- registering a value with a string identifier
+- 使用 `@Service()` 装饰器注解类（[文档](./service-decorator.md)）
+- 使用 `Token` 注册值
+- 使用字符串标识符注册值
 
-The `Token` and string identifier can be used to register other values than classes. Both tokens and string identifiers
-can register any type of value including primitive values except `undefined`. They must be set on the container with the
-`Container.set()` function before they can be requested via `Container.get()`.
+`Token` 和字符串标识符可以用来注册除类以外的其他值。Token 和字符串标识符都可以注册任何类型的值，包括原始值（除了 `undefined`）。它们必须在容器中使用 `Container.set()` 函数设置，然后才能通过 `Container.get()` 请求。
 
 ```ts
 import 'reflect-metadata';
@@ -32,28 +29,27 @@ Container.set(myToken, 'my-secret-value');
 Container.set('my-config-key', 'value-for-config-key');
 Container.set('default-pagination', 30);
 
-// somewhere else in your application
+// 在应用程序的其他地方
 const tokenValue = Container.get(myToken);
 const configValue = Container.get('my-config-key');
 const defaultPagination = Container.get('default-pagination');
 ```
 
-_For detailed documentation about `@Service` decorator please read the [@Service decorator](./service-decorator.md) page._
+_有关 `@Service` 装饰器的详细文档，请阅读 [@Service 装饰器](./service-decorator.md) 页面。_
 
-## Injecting dependencies
+## 注入依赖
 
-There are three ways to inject your dependencies:
+有三种方式来注入你的依赖：
 
-- automatic class constructor parameter injection
-- annotating class properties with the `@Inject()` decorator
-- directly using `Container.get()` to request an instance of a class, `Token` or string identifier
+- 自动类构造函数参数注入
+- 使用 `@Inject()` 装饰器注解类属性
+- 直接使用 `Container.get()` 来请求类、`Token` 或字符串标识符的实例
 
-### Constructor argument injection
+### 构造函数参数注入
 
-Any class which has been marked with the `@Service()` decorator will have its constructor properties automatically
-injected with the correct dependency.
+任何使用 `@Service()` 装饰器标记的类都会自动将正确的依赖注入到其构造函数属性中。
 
-**TypeDI inserts the container instance** which was used to resolve the dependencies **as the last parameter in the constructor**.
+**TypeDI 会将用于解析依赖的容器实例**作为**构造函数的最后一个参数**插入。
 
 ```ts
 import 'reflect-metadata';
@@ -70,13 +66,12 @@ class ExampleClass {
 const instance = Container.get(ExampleClass);
 
 console.log(instance.injectedClass instanceof InjectedClass);
-// prints true as TypeDI assigned the instance of InjectedClass to the property
+// 输出 true，因为 TypeDI 将 InjectedClass 的实例分配给了属性
 ```
 
-### Property injection
+### 属性注入
 
-Any property which has been marked with the `@Inject` decorator will be automatically assigned the instance of the class
-when the parent class is initialized by TypeDI.
+任何使用 `@Inject` 装饰器标记的属性都会在父类被 TypeDI 初始化时自动分配类的实例。
 
 ```ts
 import 'reflect-metadata';
@@ -94,19 +89,18 @@ class ExampleClass {
 const instance = Container.get(ExampleClass);
 
 console.log(instance.injectedClass instanceof InjectedClass);
-// prints true as the instance of InjectedClass has been assigned to the `injectedClass` property by TypeDI
+// 输出 true，因为 InjectedClass 的实例已经被 TypeDI 分配给了 `injectedClass` 属性
 ```
 
-_For detailed documentation about `@Inject` decorator please read the [@Inject decorator](./inject-decorator.md) page._
+_有关 `@Inject` 装饰器的详细文档，请阅读 [@Inject 装饰器](./inject-decorator.md) 页面。_
 
-### Using `Container.get()`
+### 使用 `Container.get()`
 
-The `Container.get()` function can be used directly to request an instance of the target type. TypeDI will resolve and
-initialize all dependency on the target class. `Container.get()` can be used to request:
+`Container.get()` 函数可以直接用来请求目标类型的实例。TypeDI 会解析并初始化目标类的所有依赖。`Container.get()` 可以用来请求：
 
-- a constructable value (class definition) which will return the class instance
-- a `Token` which will return the value registered for that `Token`
-- a string which will return the value registered with that name
+- 可构造的值（类定义），将返回类实例
+- `Token`，将返回为该 `Token` 注册的值
+- 字符串，将返回使用该名称注册的值
 
 ```ts
 import 'reflect-metadata';
@@ -123,25 +117,25 @@ class ExampleClass {
   injectedClass: InjectedClass;
 }
 
-/** Tokens must be explicity set in the Container with the desired value. */
+/** Token 必须在容器中显式设置所需的值。 */
 Container.set(myToken, 'my-secret-value');
-/** String identifier must be explicity set in the Container with the desired value. */
+/** 字符串标识符必须在容器中显式设置所需的值。 */
 Container.set('my-dependency-name-A', InjectedClass);
 Container.set('my-dependency-name-B', 'primitive-value');
 
 const injectedClassInstance = Container.get(InjectedClass);
-// a class without dependencies can be required
+// 可以请求没有依赖的类
 const exampleClassInstance = Container.get(ExampleClass);
-// a class with dependencies can be required and dependencies will be resolved
+// 可以请求有依赖的类，依赖会被解析
 const tokenValue = Container.get(myToken);
-// tokenValue will be 'my-secret-value'
+// tokenValue 将是 'my-secret-value'
 const stringIdentifierValueA = Container.get('my-dependency-name-A');
-// stringIdentifierValueA will be instance of InjectedClass
+// stringIdentifierValueA 将是 InjectedClass 的实例
 const stringIdentifierValueB = Container.get('my-dependency-name-B');
-// stringIdentifierValueB will be 'primitive-value'
+// stringIdentifierValueB 将是 'primitive-value'
 ```
 
-_For detailed documentation about `Token` class please read the [Service Tokens](./service-tokens.md) page._
+_有关 `Token` 类的详细文档，请阅读[服务令牌](./service-tokens.md)页面。_
 
 ## 服务作用域:Singleton、Container 和 Transient
 

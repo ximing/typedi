@@ -1,13 +1,13 @@
 ---
 id: inheritance
-title: Inheritance
-sidebar_label: Inheritance
+title: 继承
+sidebar_label: 继承
 ---
 
-# Inheritance
+# 继承
 
-Inheritance is supported **for properties** when both the base and the extended class is marked with the `@Service()` decorator.
-Classes which extend a class with decorated properties will receive the initialized class instances on those properties upon creation.
+当基类和扩展类都使用 `@Service()` 装饰器标记时，**属性的**继承是受支持的。
+扩展具有装饰属性的类的类，在创建时会在这些属性上接收初始化的类实例。
 
 ```ts
 import 'reflect-metadata';
@@ -32,11 +32,11 @@ class ExtendedClass extends BaseClass {
 }
 
 const instance = Container.get(ExtendedClass);
-// instance has the `name` property with "ExtendedClass" value (overwritten the base class)
-// and the `injectedClass` property with the instance of the `InjectedClass` class
+// instance 具有值为 "ExtendedClass" 的 `name` 属性（覆盖了基类）
+// 和具有 `InjectedClass` 类实例的 `injectedClass` 属性
 
 console.log(instance.injectedClass.name);
-// logs "InjectedClass"
+// 输出 "InjectedClass"
 console.log(instance.name);
-// logs "ExtendedClass"
+// 输出 "ExtendedClass"
 ```

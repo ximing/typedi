@@ -1,14 +1,14 @@
 ---
 id: custom-decorators
-title: Creating custom decorators
-sidebar_label: Creating custom decorators
+title: 创建自定义装饰器
+sidebar_label: 创建自定义装饰器
 ---
 
-# Creating custom decorators
+# 创建自定义装饰器
 
-> **NOTE:** This page is a direct copy of the old documentation. It will be reworked.
+> **注意：** 此页面是旧文档的直接副本。将会重新编写。
 
-You can create your own decorators which will inject your given values for your service dependencies. For example:
+你可以创建自己的装饰器，为你的服务依赖注入给定的值。例如：
 
 ```ts
 // Logger.ts
@@ -39,7 +39,7 @@ export class UserRepository {
   constructor(@Logger() private logger: LoggerInterface) {}
 
   save(user: User) {
-    this.logger.log(`user ${user.firstName} ${user.secondName} has been saved.`);
+    this.logger.log(`用户 ${user.firstName} ${user.secondName} 已被保存。`);
   }
 }
 ```

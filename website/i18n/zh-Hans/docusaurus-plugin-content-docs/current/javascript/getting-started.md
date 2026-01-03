@@ -1,26 +1,26 @@
 ---
 id: getting-started
-title: Getting started without TypeScript
-sidebar_label: Getting started without TypeScript
+title: JavaScript 快速开始
+sidebar_label: JavaScript 快速开始
 ---
 
-# Getting started without TypeScript
+# JavaScript 快速开始
 
-It's possible to use TypeDI without TypesScript, however some of the functionality is limited or not available.
-These differences are listed below in the [Limitations][limitations-sections] section.
+可以在没有 TypeScript 的情况下使用 TypeDI，但是某些功能会受到限制或不可用。
+这些差异在下面的[限制][limitations-sections]部分中列出。
 
-## Installation
+## 安装
 
-To start using TypeDI with JavaScript install the required packages via NPM:
+要在 JavaScript 中开始使用 TypeDI，请通过 NPM 安装所需的包：
 
 ```bash
 npm install typedi reflect-metadata
 ```
 
-## Basic usage
+## 基本用法
 
-The most basic usage is to request an instance of a class definition. TypeDI will check if an instance of the class has
-been created before and return the cached version or it will create a new instance, cache and return it.
+最基本的用法是请求一个类定义的实例。TypeDI 会检查该类的实例是否已经创建过，
+如果有则返回缓存的版本，否则会创建一个新实例，缓存并返回它。
 
 ```js
 import 'reflect-metadata';
@@ -32,27 +32,27 @@ class ExampleClass {
   }
 }
 
-/** Register this class to the TypeDI container */
+/** 将此类注册到 TypeDI 容器 */
 Container.set({ id: ExampleClass, type: ExampleClass });
 
-/** Request an instance of ExampleClass from TypeDI. */
+/** 从 TypeDI 请求 ExampleClass 的实例。 */
 const classInstance = Container.get(ExampleClass);
 
-/** We received an instance of ExampleClass and ready to work with it. */
+/** 我们收到了 ExampleClass 的实例，可以开始使用它。 */
 classInstance.print();
 ```
 
-For more advanced usage examples and patterns please read the [next page][basic-usage-page].
+有关更高级的用法示例和模式，请阅读[下一页][basic-usage-page]。
 
-## Limitations
+## 限制
 
-When registering your dependencies with the `Container.set()` method, there are three options available that must be set. Either one of the following are allowed: `type`, `factory`, or `value` but not more than one.
+当使用 `Container.set()` 方法注册依赖时，有三个可用选项必须设置。只允许使用以下选项中的一个：`type`、`factory` 或 `value`，不能同时使用多个。
 
 - `Container.set({ id: ExampleClass, type: ExampleClass});`
 - `Container.set({ id: ExampleClass, value: new ExampleClass});`
 - `Container.set({ id: ExampleClass, factory: ExampleClass});`
 
-To get started quickly, it is recommend to use `type` due to the fact that using `value` will instantiate the class before it's registered to the TypeDI Container. Using `type` will also assure that the TypeDI Container is injected to the constructor.
+为了快速开始，建议使用 `type`，因为使用 `value` 会在类注册到 TypeDI 容器之前就实例化该类。使用 `type` 还能确保 TypeDI 容器被注入到构造函数中。
 
 [limitations-sections]: #limitations
 [basic-usage-page]: ./basic-usage.md
