@@ -50,7 +50,7 @@ const config: Config = {
       {
         docs: {
           sidebarPath: './sidebars.ts',
-          routeBasePath: '/',
+          routeBasePath: '/docs',
           // Edit links point to GitHub
           editUrl: 'https://github.com/ximing/typedi/edit/develop/website/',
           editLocalizedFiles: true,
@@ -58,7 +58,11 @@ const config: Config = {
           showLastUpdateAuthor: true,
         },
         blog: false, // Disable blog for documentation site
-        pages: false, // Disable pages plugin to avoid conflicts with docs routeBasePath
+        pages: {
+          path: 'src/pages',
+          routeBasePath: '/',
+          include: ['**/*.{js,jsx,ts,tsx,md,mdx}'],
+        },
         theme: {
           customCss: './src/css/custom.css',
         },
@@ -109,11 +113,11 @@ const config: Config = {
           items: [
             {
               label: 'TypeScript 指南',
-              to: '/typescript/getting-started',
+              to: '/docs/typescript/getting-started',
             },
             {
               label: 'JavaScript 指南',
-              to: '/javascript/getting-started',
+              to: '/docs/javascript/getting-started',
             },
           ],
         },

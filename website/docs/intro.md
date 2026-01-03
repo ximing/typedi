@@ -2,7 +2,6 @@
 id: intro
 title: TypeDI Documentation
 sidebar_label: Introduction
-slug: /
 ---
 
 # TypeDI Documentation

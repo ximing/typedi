@@ -2,7 +2,6 @@
 id: intro
 title: TypeDI 文档
 sidebar_label: 介绍
-slug: /
 ---
 
 # TypeDI 文档
