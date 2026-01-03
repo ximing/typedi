@@ -54,5 +54,5 @@ classInstance.print();
 
 为了快速开始，建议使用 `type`，因为使用 `value` 会在类注册到 TypeDI 容器之前就实例化该类。使用 `type` 还能确保 TypeDI 容器被注入到构造函数中。
 
-[limitations-sections]: #limitations
+[limitations-sections]: #限制
 [basic-usage-page]: ./basic-usage.md
