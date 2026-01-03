@@ -1,71 +1,67 @@
+---
+id: service-tokens
+title: Service Tokens
+sidebar_label: Service Tokens
+---
+
 # Service Tokens
 
-Service tokens are unique identifiers what provides type-safe access to a value stored in a `Container`.
+Service tokens provide a way to register and inject non-class values like configuration objects, primitive values, or factory functions.
 
-```ts
-import 'reflect-metadata';
-import { Container, Token } from 'typedi';
+## Creating Tokens
 
-export const JWT_SECRET_TOKEN = new Token<string>('MY_SECRET');
+```typescript
+import { Token, Container } from '@rabjs/typedi';
 
-Container.set(JWT_SECRET_TOKEN, 'wow-such-secure-much-encryption');
-
-/**
- * Somewhere else in the application after the JWT_SECRET_TOKEN is
- * imported in can be used to request the secret from the Container.
- *
- * This value is type-safe also because the Token is typed.
- */
-const JWT_SECRET = Container.get(JWT_SECRET_TOKEN);
+const CONFIG_TOKEN = new Token<{ apiUrl: string; timeout: number }>('app.config');
+const API_URL_TOKEN = new Token<string>('api.url');
 ```
 
-## Injecting service tokens
+## Registering Values
 
-They can be used with the `@Inject()` decorator to overwrite the inferred type of the property or argument.
+```typescript
+// Register configuration object
+Container.set(CONFIG_TOKEN, {
+  apiUrl: 'https://api.example.com',
+  timeout: 5000,
+});
 
-```ts
-import 'reflect-metadata';
-import { Container, Token, Inject, Service } from 'typedi';
+// Register primitive value
+Container.set(API_URL_TOKEN, 'https://api.example.com');
+```
 
-export const JWT_SECRET_TOKEN = new Token<string>('MY_SECRET');
+## Injecting Tokens
 
-Container.set(JWT_SECRET_TOKEN, 'wow-such-secure-much-encryption');
+```typescript
+import { Service, Inject } from '@rabjs/typedi';
 
 @Service()
-class Example {
-  @Inject(JWT_SECRET_TOKEN)
-  myProp: string;
+class ApiService {
+  constructor(
+    @Inject(CONFIG_TOKEN) private config: { apiUrl: string; timeout: number },
+    @Inject(API_URL_TOKEN) private apiUrl: string,
+  ) {}
+
+  makeRequest() {
+    // Use this.config and this.apiUrl
+  }
 }
-
-const instance = Container.get(Example);
-// The instance.myProp property has the value assigned for the Token
 ```
 
-## Tokens with same name
+## String Identifiers
 
-Two token **with the same name are different tokens**. The name is only used to help the developer identify the tokens
-during debugging and development. (It's included in error the messages.)
+You can also use simple strings as identifiers:
 
-```ts
-import 'reflect-metadata';
-import { Container, Token } from 'typedi';
+```typescript
+Container.set('database.host', 'localhost');
+Container.set('database.port', 5432);
 
-const tokenA = new Token('TOKEN');
-const tokenB = new Token('TOKEN');
+@Service()
+class DatabaseService {
+  @Inject('database.host')
+  private host: string;
 
-Container.set(tokenA, 'value-A');
-Container.set(tokenB, 'value-B');
-
-const tokenValueA = Container.get(tokenA);
-// tokenValueA is "value-A"
-const tokenValueB = Container.get(tokenB);
-// tokenValueB is "value-B"
-
-console.log(tokenValueA === tokenValueB);
-// returns false, as Tokens are always unique
+  @Inject('database.port')
+  private port: number;
+}
 ```
-
-## Difference between Token and string identifier
-
-They both achieve the same goal, however, it's recommended to use `Tokens` as they are type-safe and cannot be mistyped,
-while a mistyped string identifier will silently return `undefined` as value by default.

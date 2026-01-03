@@ -1,25 +1,32 @@
+---
+id: intro
+title: TypeDI Documentation
+sidebar_label: Introduction
+slug: /
+---
+
 # TypeDI Documentation
 
-TypeDI 是一个强大的依赖注入容器，专为 TypeScript 和 JavaScript 应用程序设计。它提供了简洁的 API 和装饰器语法，让你能够轻松管理应用程序中的依赖关系。
+TypeDI is a powerful dependency injection container designed specifically for TypeScript and JavaScript applications. It provides a clean API and decorator syntax that makes managing dependencies in your application effortless.
 
-## 特性
+## Features
 
-- 🎯 **简单易用** - 通过装饰器实现依赖注入
-- 📦 **TypeScript 优先** - 完整的类型支持
-- 🔄 **多种注入方式** - 支持构造函数注入、属性注入等
-- 🏷️ **Service Token** - 支持字符串和 Symbol 标识符
-- 🔧 **灵活配置** - 支持作用域容器和瞬时服务
-- ⚡ **轻量级** - 无外部依赖，体积小
+- 🎯 **Simple to Use** - Dependency injection through decorators
+- 📦 **TypeScript First** - Complete type support
+- 🔄 **Multiple Injection Methods** - Constructor injection, property injection, etc.
+- 🏷️ **Service Tokens** - Support for string and Symbol identifiers
+- 🔧 **Flexible Configuration** - Scoped containers and transient services
+- ⚡ **Lightweight** - No external dependencies, small bundle size
 
-## 快速开始
+## Quick Start
 
-### 安装
+### Installation
 
 ```bash
 npm install @rabjs/typedi reflect-metadata
 ```
 
-### 基本用法
+### Basic Usage
 
 ```typescript
 import 'reflect-metadata';
@@ -71,35 +78,35 @@ class CoffeeMaker {
   }
 }
 
-// 使用容器获取服务
+// Use container to get service
 const coffeeMaker = Container.get<CoffeeMaker>('coffee.maker');
 coffeeMaker.make();
 ```
 
-## 指南
+## Guides
 
-- [TypeScript 使用指南](./typescript/getting-started) - 学习如何在 TypeScript 项目中使用 TypeDI
-- [JavaScript 使用指南](./javascript/getting-started) - 了解 JavaScript 项目中的用法
+- [TypeScript Guide](./typescript/getting-started) - Learn how to use TypeDI in TypeScript projects
+- [JavaScript Guide](./javascript/getting-started) - Understand usage in JavaScript projects
 
-## 核心概念
+## Core Concepts
 
-- **Container API** - 容器的基本操作方法
-- **@Service 装饰器** - 声明可注入的服务
-- **@Inject 装饰器** - 注入依赖项
-- **Service Tokens** - 服务标识符的使用
+- **Container API** - Basic operations of the container
+- **@Service Decorator** - Declare injectable services
+- **@Inject Decorator** - Inject dependencies
+- **Service Tokens** - Using service identifiers
 
-## 高级特性
+## Advanced Features
 
-- **服务继承** - 如何处理继承关系
-- **自定义装饰器** - 创建自己的注入装饰器
-- **作用域容器** - 管理服务的生命周期
-- **Transient 服务** - 每次注入都创建新实例
+- **Service Inheritance** - How to handle inheritance relationships
+- **Custom Decorators** - Create your own injection decorators
+- **Scoped Containers** - Manage service lifecycles
+- **Transient Services** - Create new instances for each injection
 
-## 集成
+## Integrations
 
-- **TypeORM 集成** - 与 TypeORM 的完美结合
+- **TypeORM Integration** - Perfect integration with TypeORM
 
-## 社区
+## Community
 
 - [GitHub Repository](https://github.com/ximing/typedi)
 - [npm Package](https://www.npmjs.com/package/@rabjs/typedi)

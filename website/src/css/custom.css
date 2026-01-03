@@ -43,23 +43,23 @@
   --ifm-color-primary-lightest: #85b8ff;
 
   /* Code blocks in dark theme */
-  --ifm-code-background: #1e1e1e;
+  --ifm-code-background: #282c34;
   --ifm-code-color: #d4d4d4;
   --docusaurus-highlighted-code-line-bg: rgba(255, 255, 255, 0.1);
+
+  /* Sidebar in dark theme */
+  --ifm-sidebar-background: #242526;
 }
 
-/* Improved code block styling - matching GitBook's dark theme */
+/* Code block styling for both themes */
+/* Light theme code blocks */
 .theme-code-block {
-  --prism-background-color: #1e1e1e;
-}
-
-[data-theme='dark'] .theme-code-block {
-  --prism-background-color: #1e1e1e;
+  --prism-background-color: #f6f8fa;
 }
 
 .theme-code-block pre {
-  background-color: #1e1e1e !important;
-  border: none;
+  background-color: var(--prism-background-color) !important;
+  border: 1px solid var(--ifm-color-emphasis-300);
   border-radius: 5px;
   padding: 16px;
   overflow-x: auto;
@@ -68,6 +68,20 @@
 .theme-code-block pre > code {
   background-color: transparent;
   padding: 0;
+  color: var(--ifm-color-content);
+}
+
+/* Dark theme code blocks */
+[data-theme='dark'] .theme-code-block {
+  --prism-background-color: #1e1e1e;
+}
+
+[data-theme='dark'] .theme-code-block pre {
+  background-color: #1e1e1e !important;
+  border: 1px solid #444;
+}
+
+[data-theme='dark'] .theme-code-block pre > code {
   color: #d4d4d4;
 }
 
@@ -140,6 +154,7 @@ code:not(.theme-code-block code) {
   background-color: var(--ifm-sidebar-background);
 }
 
+/* Light theme sidebar */
 .theme-doc-sidebar-item-link--active {
   color: var(--ifm-color-primary) !important;
   font-weight: bold;
@@ -149,6 +164,12 @@ code:not(.theme-code-block code) {
 
 .theme-doc-sidebar-item-link {
   padding: 8px 15px;
+}
+
+/* Dark theme sidebar */
+[data-theme='dark'] .theme-doc-sidebar-item-link--active {
+  background-color: rgba(33, 136, 255, 0.15) !important;
+  border-left: 3px solid var(--ifm-color-primary);
 }
 
 /* Responsive design adjustments */
@@ -164,13 +185,25 @@ code:not(.theme-code-block code) {
 }
 
 /* Copy code button styling */
+/* Light theme copy button */
 .theme-code-block .clean-btn {
+  background-color: rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  color: var(--ifm-color-content);
+}
+
+.theme-code-block .clean-btn:hover {
+  background-color: rgba(0, 0, 0, 0.2);
+}
+
+/* Dark theme copy button */
+[data-theme='dark'] .theme-code-block .clean-btn {
   background-color: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.2);
   color: #d4d4d4;
 }
 
-.theme-code-block .clean-btn:hover {
+[data-theme='dark'] .theme-code-block .clean-btn:hover {
   background-color: rgba(255, 255, 255, 0.2);
 }
 

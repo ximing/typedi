@@ -1,0 +1,22 @@
+{
+  "title": {
+    "message": "TypeDI",
+    "description": "The title in the navbar"
+  },
+  "item.label.文档": {
+    "message": "Documentation",
+    "description": "Navbar item with label 文档"
+  },
+  "item.label.GitHub": {
+    "message": "GitHub",
+    "description": "Navbar item with label GitHub"
+  },
+  "item.label.npm": {
+    "message": "npm",
+    "description": "Navbar item with label npm"
+  },
+  "logo.alt": {
+    "message": "TypeDI Logo",
+    "description": "The alt text of navbar logo"
+  }
+}

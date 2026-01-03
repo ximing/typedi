@@ -1,0 +1,30 @@
+{
+  "version.label": {
+    "message": "当前版本",
+    "description": "The label for version current"
+  },
+  "sidebar.tutorialSidebar.category.TypeScript 使用指南": {
+    "message": "TypeScript 使用指南",
+    "description": "The label for category 'TypeScript 使用指南' in sidebar 'tutorialSidebar'"
+  },
+  "sidebar.tutorialSidebar.category.快速开始": {
+    "message": "快速开始",
+    "description": "The label for category '快速开始' in sidebar 'tutorialSidebar'"
+  },
+  "sidebar.tutorialSidebar.category.核心概念": {
+    "message": "核心概念",
+    "description": "The label for category '核心概念' in sidebar 'tutorialSidebar'"
+  },
+  "sidebar.tutorialSidebar.category.高级特性": {
+    "message": "高级特性",
+    "description": "The label for category '高级特性' in sidebar 'tutorialSidebar'"
+  },
+  "sidebar.tutorialSidebar.category.集成": {
+    "message": "集成",
+    "description": "The label for category '集成' in sidebar 'tutorialSidebar'"
+  },
+  "sidebar.tutorialSidebar.category.JavaScript 使用指南": {
+    "message": "JavaScript 使用指南",
+    "description": "The label for category 'JavaScript 使用指南' in sidebar 'tutorialSidebar'"
+  }
+}

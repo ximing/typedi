@@ -1,43 +1,28 @@
+---
+id: getting-started
+title: Getting Started
+sidebar_label: Getting Started
+---
+
 # Getting Started
 
-TypeDI is a [dependency injection](https://en.wikipedia.org/wiki/Dependency_injection) library for TypeScript and JavaScript.
+TypeDI is a dependency injection library that allows you to build well-structured applications using TypeScript and JavaScript. This page will guide you through the basics of using TypeDI.
 
 ## Installation
 
-> Note: This installation guide is for usage with TypeScript, if you wish to use TypeDI without Typescript
-> please read the [getting started guide][getting-started-js] for JavaScript.
-
-To start using TypeDI install the required packages via NPM:
+To get started with TypeDI, you need to install the package and reflect-metadata:
 
 ```bash
-npm install typedi reflect-metadata
+npm install @rabjs/typedi reflect-metadata
 ```
 
-Import the `reflect-metadata` package at the **first line** of your application:
+## Basic Example
 
-```ts
+Here's a simple example showing how to use TypeDI:
+
+```typescript
 import 'reflect-metadata';
-
-// Your other imports and initialization code
-// comes here after you imported the reflect-metadata package!
-```
-
-As the last step, you need to enable emitting decorator metadata in your Typescript config. Add these two lines to your `tsconfig.json` file under the `compilerOptions` key:
-
-```json
-"emitDecoratorMetadata": true,
-"experimentalDecorators": true,
-```
-
-Now you are ready to use TypeDI with Typescript!
-
-## Basic Usage
-
-The most basic usage is to request an instance of a class definition. TypeDI will check if an instance of the class has
-been created before and return the cached version or it will create a new instance, cache, and return it.
-
-```ts
-import { Container, Service } from 'typedi';
+import { Container, Service } from '@rabjs/typedi';
 
 @Service()
 class ExampleInjectedService {
@@ -48,13 +33,7 @@ class ExampleInjectedService {
 
 @Service()
 class ExampleService {
-  constructor(
-    // because we annotated ExampleInjectedService with the @Service()
-    // decorator TypeDI will automatically inject an instance of
-    // ExampleInjectedService here when the ExampleService class is requested
-    // from TypeDI.
-    public injectedService: ExampleInjectedService,
-  ) {}
+  constructor(public injectedService: ExampleInjectedService) {}
 }
 
 const serviceInstance = Container.get(ExampleService);
@@ -64,4 +43,18 @@ serviceInstance.injectedService.printMessage();
 // logs "I am alive!" to the console
 ```
 
-[getting-started-js]: ../javascript/getting-started.md
+## Key Concepts
+
+- **@Service()**: Marks a class as a service that can be injected
+- **Container**: The main container that manages all services
+- **Dependency Injection**: Automatic injection of dependencies into constructors
+
+## Next Steps
+
+Continue reading to learn more about:
+
+- [Basic Usage Guide](./basic-usage-guide)
+- [Container API](./container-api)
+- [Service Decorator](./service-decorator)
+
+[getting-started-js]: ../javascript/getting-started

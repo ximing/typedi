@@ -1,52 +1,58 @@
-# Getting started without TypeScript
+---
+id: getting-started
+title: Getting Started with JavaScript
+sidebar_label: Getting Started with JavaScript
+---
 
-It's possible to use TypeDI without TypesScript, however some of the functionality is limited or not available.
-These differences are listed below in the [Limitations][limitations-sections] section.
+# Getting Started with JavaScript
+
+TypeDI can also be used with plain JavaScript, although TypeScript provides better type safety and developer experience.
 
 ## Installation
 
-To start using TypeDI with JavaScript install the required packages via NPM:
-
 ```bash
-npm install typedi reflect-metadata
+npm install @rabjs/typedi reflect-metadata
 ```
 
-## Basic usage
+## Basic Example
 
-The most basic usage is to request an instance of a class definition. TypeDI will check if an instance of the class has
-been created before and return the cached version or it will create a new instance, cache and return it.
+```javascript
+require('reflect-metadata');
+const { Container, Service } = require('@rabjs/typedi');
 
-```js
-import 'reflect-metadata';
-import { Container } from 'typedi';
-
-class ExampleClass {
-  print() {
-    console.log('I am alive!');
+// Define a service
+class UserService {
+  getUsers() {
+    return ['John', 'Jane'];
   }
 }
 
-/** Register this class to the TypeDI container */
-Container.set({ id: ExampleClass, type: ExampleClass });
+// Register the service
+Container.set(UserService, new UserService());
 
-/** Request an instance of ExampleClass from TypeDI. */
-const classInstance = Container.get(ExampleClass);
+// Or use the Service decorator (requires Babel for decorators)
+// @Service()
+// class UserService { ... }
 
-/** We received an instance of ExampleClass and ready to work with it. */
-classInstance.print();
+// Get the service
+const userService = Container.get(UserService);
+console.log(userService.getUsers()); // ['John', 'Jane']
 ```
-
-For more advanced usage examples and patterns please read the [next page][basic-usage-page].
 
 ## Limitations
 
-When registering your dependencies with the `Container.set()` method, there are three options available that must be set. Either one of the following are allowed: `type`, `factory`, or `value` but not more than one.
+When using TypeDI with JavaScript:
 
-- `Container.set({ id: ExampleClass, type: ExampleClass});`
-- `Container.set({ id: ExampleClass, value: new ExampleClass});`
-- `Container.set({ id: ExampleClass, factory: ExampleClass});`
+- Type information is not available at runtime
+- You need to manually register services or use Babel for decorators
+- No automatic constructor parameter injection
+- Manual dependency management required
 
-To get started quickly, it is recommend to use `type` due to the fact that using `value` will instantiate the class before it's registered to the TypeDI Container. Using `type` will also assure that the TypeDI Container is injected to the constructor.
+## Next Steps
 
-[limitations-sections]: #limitations
-[basic-usage-page]: ./basic-usage.md
+For better experience, consider:
+
+- [Basic Usage](./basic-usage) - Learn more about JavaScript usage
+- [TypeScript Guide](../typescript/getting-started) - Migrate to TypeScript for better DX
+
+[basic-usage-page]: ./basic-usage

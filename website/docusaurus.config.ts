@@ -7,7 +7,7 @@ import type * as Preset from '@docusaurus/preset-classic';
 const config: Config = {
   title: 'TypeDI Documentation',
   tagline: 'Dependency injection for TypeScript and JavaScript',
-  favicon: 'img/favicon.ico',
+  favicon: 'img/favicon.svg',
 
   // Future flags, see https://docusaurus.io/docs/api/docusaurus-config#future
   future: {
@@ -24,26 +24,22 @@ const config: Config = {
   organizationName: 'ximing', // GitHub org/user name.
   projectName: 'typedi', // Repo name.
 
-  onBrokenLinks: 'throw',
+  onBrokenLinks: 'warn',
 
   // Internationalization configuration
   i18n: {
-    defaultLocale: 'zh-Hans',
-    locales: ['zh-Hans', 'en'],
+    defaultLocale: 'en',
+    locales: ['en', 'zh-Hans'],
     localeConfigs: {
-      'zh-Hans': {
-        label: '中文',
-        direction: 'ltr',
-        htmlLang: 'zh-Hans',
-        calendar: 'gregory',
-        path: 'zh-Hans',
-      },
       en: {
         label: 'English',
         direction: 'ltr',
         htmlLang: 'en',
-        calendar: 'gregory',
-        path: 'en',
+      },
+      'zh-Hans': {
+        label: '中文',
+        direction: 'ltr',
+        htmlLang: 'zh-Hans',
       },
     },
   },
@@ -54,6 +50,7 @@ const config: Config = {
       {
         docs: {
           sidebarPath: './sidebars.ts',
+          routeBasePath: '/',
           // Edit links point to GitHub
           editUrl: 'https://github.com/ximing/typedi/edit/develop/website/',
           editLocalizedFiles: true,
@@ -61,6 +58,7 @@ const config: Config = {
           showLastUpdateAuthor: true,
         },
         blog: false, // Disable blog for documentation site
+        pages: false, // Disable pages plugin to avoid conflicts with docs routeBasePath
         theme: {
           customCss: './src/css/custom.css',
         },
@@ -69,8 +67,8 @@ const config: Config = {
   ],
 
   themeConfig: {
-    // Replace with your project's social card
-    image: 'img/typedi-social-card.jpg',
+    // TypeDI social media card
+    image: 'img/typedi-social-card.svg',
     colorMode: {
       respectPrefersColorScheme: true,
     },
@@ -111,11 +109,11 @@ const config: Config = {
           items: [
             {
               label: 'TypeScript 指南',
-              to: '/docs/typescript/getting-started',
+              to: '/typescript/getting-started',
             },
             {
               label: 'JavaScript 指南',
-              to: '/docs/javascript/getting-started',
+              to: '/javascript/getting-started',
             },
           ],
         },

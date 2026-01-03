@@ -1,13 +1,9 @@
-# Usage with TypeORM and routing-controllers
+---
+id: usage-with-typeorm
+title: Usage with TypeORM
+sidebar_label: Usage with TypeORM
+---
 
-To use TypeDI with routing-controllers and/or TypeORM, it's required to configure them to use the top-level
-TypeDI container used by your application.
+# Usage with TypeORM
 
-```ts
-import { useContainer as rcUseContainer } from 'routing-controllers';
-import { useContainer as typeOrmUseContainer } from 'typeorm';
-import { Container } from 'typedi';
-
-rcUseContainer(Container);
-typeOrmUseContainer(Container);
-```
+This documentation is being translated. Please refer to the Chinese version for now.
